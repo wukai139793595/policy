@@ -8,9 +8,11 @@ import ElementUi from 'element-ui'
 import 'lib-flexible'
 import './assets/style/util.css'
 import 'element-ui/lib/theme-chalk/index.css';
+import moment from 'vue-moment'
 Vue.config.productionTip = false
 
 Vue.use(ElementUi)
+Vue.use(moment)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

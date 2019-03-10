@@ -9,21 +9,50 @@
         <div class="set-time">
             <p>请设置保险起止时间</p>
             <div class="time-wrap">
-                <div class="time time-left">2019-03-06</div>
+                <el-date-picker
+                    class="data-picker"
+                    v-model="value11"
+                    type="date"
+                    :placeholder="today|moment('YYYY-MM-DD')"
+                    format="yyyy-MM-dd"
+                    value-format="yyyy-MM-dd">
+                </el-date-picker>
                 <div class="striping"></div>
-                <div class="time time-right">2019-03-06</div>
+                <el-date-picker
+                    v-model="value12"
+                    type="date"
+                    :placeholder="today|moment('YYYY-MM-DD')"
+                    format="yyyy-MM-dd"
+                    value-format="yyyy-MM-dd">
+                </el-date-picker>
             </div>
         </div>
         <div class="info-wrap">
             <p>请填写投保人信息</p>
-            <div class="info-content">
+            <div class="info-content">               
                 <div class="name-wrap">
                     <span class="name">姓名</span>
                     <input type="text" placeholder="输入投保人姓名">
                 </div>
+                <div class="identify-wrap">
+                    <span class="name">证件类型</span>
+                      <el-select v-model="selectValue" placeholder="请选择">
+                        <el-option
+                        v-for="item in options"
+                        :key="item.num"
+                        :label="item.type"
+                        :value="item.num">
+                        </el-option>
+                    </el-select>
+                </div>
                 <div class="name-wrap">
-                    <span class="name">身份证</span>
+                    <span class="name">证件号</span>
                     <input type="text" placeholder="输入投保人身份证">
+                </div>
+                <div class="sex-wrap">
+                    <span class="sex">性别</span>
+                    <el-radio v-model="sex" label="0">男</el-radio>
+                    <el-radio v-model="sex" label="1">女</el-radio>                    
                 </div>
                 <div class="phone-wrap">
                     <span class="phone">电话</span>
@@ -32,6 +61,17 @@
                 <div class="email-wrap">
                     <span class="email">邮箱</span>
                     <input type="text" placeholder="输入投保人邮箱">
+                </div>
+                <div class="relative-wrap">
+                    <span class="name">关系</span>
+                    <el-select class="el-se-relative" v-model="relativeValue" placeholder="请选择">
+                        <el-option
+                        v-for="item in options2"
+                        :key="item.num"
+                        :label="item.type"
+                        :value="item.num">
+                        </el-option>
+                    </el-select>                    
                 </div>
             </div>
         </div>
@@ -75,15 +115,77 @@
 export default {
     data () {
         return {
+            sex: '1',
             balanceChoose: true,
-            bankChoose: false
+            bankChoose: false,
+            selectValue: '',
+            value11: '',
+            value12: '',
+            today: Date.now(),
+            options:[
+                {
+                    num: 1,
+                    type: '身份证'
+                },{
+                    num: 3,
+                    type: '护照'
+                },{
+                    num: 10,
+                    type: '港澳通行证'
+                },{
+                    num: 26,
+                    type: '台湾居民来往内地通行证'
+                }
+                // 1:身份证,3:护照,10:港澳通行证,26:台湾居民来往内地通行证
+            ],
+            relativeValue: '',
+            options2: [
+                {
+                    num: 0,
+                    type: '本人'
+                },
+                {
+                    num: 1,
+                    type: '配偶'
+                },
+                {
+                    num: 2,
+                    type: '父母'
+                },
+                {
+                    num: 3,
+                    type: '子女'
+                },
+                {
+                    num: 5,
+                    type: '兄弟姐妹'
+                },
+                {
+                    num: 6,
+                    type: '祖父母、外祖父母'
+                },
+                {
+                    num: 7,
+                    type: '雇佣'
+                },
+                {
+                    num: 9,
+                    type: '其他'
+                }
+                // 0—本人,1—配偶,2—父母,3—子女,5—兄弟姐妹,6—祖父母、外祖父母,7—雇佣,9—其他
+            ]
+
         }
     },
     methods: {
         
         turnBack (event) {
             this.$router.go(-1);
+        },
+        onSubmit() {
+            console.log('submit!');
         }
+      
     }
 }
 </script>
@@ -180,7 +282,9 @@ export default {
                     margin-right: 40px;
                     font-weight: bold;
                 }
-
+                .el-se-relative{
+                    margin-left: 40px;
+                }
             }
         }
     }

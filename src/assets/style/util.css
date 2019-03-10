@@ -39,3 +39,27 @@ li{
     width: 100%;
     height: 100%;
 }
+
+div.el-popper{
+    width: 500px;
+    height: 500px;
+}
+div.el-picker-panel__body-wrapper{
+    width: 500px;
+    height: 500px;    
+}
+div.el-picker-panel__body{
+    width: 500px;
+    height: 500px;     
+}
+.el-picker-panel__body-wrapper .el-picker-panel__body .el-picker-panel__content{
+    padding-top: 40px;
+    width: 480px;   
+    height: 450px;
+}
+span.el-input__prefix{
+    display: none;
+}
+.el-picker-panel__body-wrapper .el-date-table td span{
+    border-radius: 0;
+}
