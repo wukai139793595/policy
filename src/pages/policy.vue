@@ -6,27 +6,45 @@
             </div>
             <div class="title">购买保险</div>
         </div>
-        <div class="group-wrap">
-            <div class="group-list" v-for="index in 9" :key="index">
-                <div class="name-wrap">
-                    <div class="group-name">
-                        少儿围棋一组
+        <scroll @refresh="refresh" @loadmore="loadmore">
+            <div class="group-wrap">
+                <div class="group-list" v-for="index in initNum" :key="index">
+                    <div class="name-wrap">
+                        <div class="group-name">
+                            少儿围棋一组
+                        </div>
+                        <div class="group-info">
+                            <span>总人数：{{'50'}}人，</span>
+                            <span>未交保险：{{'50'}}人</span>
+                        </div>
                     </div>
-                    <div class="group-info">
-                        <span>总人数：{{'50'}}人，</span>
-                        <span>未交保险：{{'50'}}人</span>
+                    <div class="buy-btn" @click="toBuyPolicy($event, index)">
+                        购买
                     </div>
                 </div>
-                <div class="buy-btn" @click="toBuyPolicy($event, index)">
-                    购买
-                </div>
-            </div>
-        </div>
+            </div>        
+        </scroll>
     </div>
 </template>
 <script>
+import Scroll from '../components/scroll.vue'
 export default {
+    data () {
+        return {
+            initNum: 0
+        }
+    },
     methods: {
+        initData () {
+            this.initNum = 11;
+        },
+        refresh () {
+            this.initData();
+        },
+        loadmore (func) {
+            this.initNum += 9;
+            func();
+        },
         toBuyPolicy (event, index) {
             this.$router.push({
                 path: '/policyClassify',
@@ -35,6 +53,12 @@ export default {
                 }
             })
         }
+    },
+    components: {
+        Scroll
+    },
+    created () {
+        this.initData();
     }
 }
 </script>

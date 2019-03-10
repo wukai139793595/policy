@@ -11,7 +11,7 @@
                 <div class="name-wrap">
                     <div class="name">个人意外险</div>
                     <div class="choose">
-                        <span>{{'10'}}元/份</span>
+                        <span>{{money}}元/份</span>
                         <div class="img-wrap">
                             <img src="../assets/icon/circle.png" alt="" v-if="true">
                             <img src="../assets/icon/choose-circle.png" alt="" v-else>
@@ -58,15 +58,21 @@
     </div>
 </template>
 <script>
+import {mapState, mapMutations} from 'vuex'
 export default {
     data () {
         return {
             isShowProtocols: false
         }
     },
+    computed: {
+        ...mapState(['money'])
+    },
     methods: {
+        ...mapMutations(['changeMoney']) ,
         showProtocols (event) {
             this.isShowProtocols = true;
+            this.changeMoney(10);
         },
         hideProtocols (event) {
             this.isShowProtocols = false;

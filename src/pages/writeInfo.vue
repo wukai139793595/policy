@@ -73,7 +73,14 @@
 </template>
 <script>
 export default {
+    data () {
+        return {
+            balanceChoose: true,
+            bankChoose: false
+        }
+    },
     methods: {
+        
         turnBack (event) {
             this.$router.go(-1);
         }
