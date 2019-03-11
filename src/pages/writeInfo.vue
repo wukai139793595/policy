@@ -10,8 +10,9 @@
             <p>请设置保险起止时间</p>
             <div class="time-wrap">
                 <el-date-picker
+                    @change="infoChange"
                     class="data-picker"
-                    v-model="value11"
+                    v-model="startTime"
                     type="date"
                     :placeholder="today|moment('YYYY-MM-DD')"
                     format="yyyy-MM-dd"
@@ -19,7 +20,9 @@
                 </el-date-picker>
                 <div class="striping"></div>
                 <el-date-picker
-                    v-model="value12"
+                    @change="infoChange"
+                    class="data-picker"
+                    v-model="endTime"
                     type="date"
                     :placeholder="today|moment('YYYY-MM-DD')"
                     format="yyyy-MM-dd"
@@ -32,13 +35,13 @@
             <div class="info-content">               
                 <div class="name-wrap">
                     <span class="name">姓名</span>
-                    <input type="text" placeholder="输入投保人姓名">
+                    <input type="text" placeholder="输入投保人姓名" @change="infoChange" v-model="name">
                 </div>
                 <div class="identify-wrap">
                     <span class="name">证件类型</span>
-                      <el-select v-model="selectValue" placeholder="请选择">
+                      <el-select v-model="selectCertificate" placeholder="请选择" @change="infoChange">
                         <el-option
-                        v-for="item in options"
+                        v-for="item in certificateArr"
                         :key="item.num"
                         :label="item.type"
                         :value="item.num">
@@ -47,26 +50,26 @@
                 </div>
                 <div class="name-wrap">
                     <span class="name">证件号</span>
-                    <input type="text" placeholder="输入投保人身份证">
+                    <input type="text" placeholder="输入投保人身份证" @change="infoChange" v-model="certificateValue">
                 </div>
                 <div class="sex-wrap">
-                    <span class="sex">性别</span>
+                    <span class="name">性别</span>
                     <el-radio v-model="sex" label="0">男</el-radio>
                     <el-radio v-model="sex" label="1">女</el-radio>                    
                 </div>
                 <div class="phone-wrap">
-                    <span class="phone">电话</span>
-                    <input type="text" placeholder="输入投保人电话">
+                    <span class="name">电话</span>
+                    <input type="text" placeholder="输入投保人电话" @change="infoChange" v-model="phone">
                 </div>
                 <div class="email-wrap">
-                    <span class="email">邮箱</span>
-                    <input type="text" placeholder="输入投保人邮箱">
+                    <span class="name">邮箱</span>
+                    <input type="text" placeholder="输入投保人邮箱" @change="infoChange" v-model="email"> 
                 </div>
                 <div class="relative-wrap">
                     <span class="name">关系</span>
-                    <el-select class="el-se-relative" v-model="relativeValue" placeholder="请选择">
+                    <el-select class="el-se-relative" v-model="selectRelative" placeholder="请选择与被保人关系" @change="infoChange">
                         <el-option
-                        v-for="item in options2"
+                        v-for="item in relativeArr"
                         :key="item.num"
                         :label="item.type"
                         :value="item.num">
@@ -86,9 +89,9 @@
                             <div class="hint">可用额度<span>{{'1000'}}元</span></div>
                         </div>
                     </div>
-                    <div class="balance-right">
-                        <img src="../assets/icon/circle.png" alt="" class="icon-common" v-if="balanceChoose">
-                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-else>
+                    <div class="balance-right" @click="changePayWay($event)">
+                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="balanceChoose">
+                        <img src="../assets/icon/circle.png" alt="" class="icon-common" v-else>
                     </div>
                 </div>
                 <div class="bank-wrap">
@@ -96,33 +99,40 @@
                         <img class="pay-icon" src="../assets/icon/bank.png" alt="">
                         <div class="name-wrap">
                             <div class="name">建设银行</div>
-                            <div class="bank-number">储蓄卡<span>(3365)</span></div>
+                            <!-- <div class="bank-number">储蓄卡<span>(3365)</span></div> -->
                         </div>
                     </div>
-                    <div class="bank-right">
-                        <img src="../assets/icon/circle.png" alt="" class="icon-common" v-if="bankChoose">
-                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-else>                        
+                    <div class="bank-right" @click="changePayWay($event)">
+                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="bankChoose">
+                        <img src="../assets/icon/circle.png" alt="" class="icon-common" v-else>                        
                     </div>
                 </div>
             </div>
         </div>
-        <div class="submit">
+        <div class="submit" :class="{could: couldSubmit}" @click="toSubmit($event)">
             立即支付
         </div>
     </div>
 </template>
 <script>
+import {postWallet} from '@/api/api.js'
 export default {
     data () {
         return {
-            sex: '1',
+            sex: '0',
             balanceChoose: true,
             bankChoose: false,
-            selectValue: '',
-            value11: '',
-            value12: '',
+            name: '',
+            selectCertificate: '',  //用户选择的证件类型
+            certificateValue: '',    //证件号码
+            selectRelative: '',    //用户选择的关系
+            phone: '',
+            email: '',
+            startTime: '',
+            endTime: '',
             today: Date.now(),
-            options:[
+            couldSubmit: false,
+            certificateArr:[   //证件类型
                 {
                     num: 1,
                     type: '身份证'
@@ -138,8 +148,8 @@ export default {
                 }
                 // 1:身份证,3:护照,10:港澳通行证,26:台湾居民来往内地通行证
             ],
-            relativeValue: '',
-            options2: [
+
+            relativeArr: [    //投保人与被投保人关系
                 {
                     num: 0,
                     type: '本人'
@@ -178,12 +188,40 @@ export default {
         }
     },
     methods: {
-        
+        checkSubmit () {  //判断用户信息是否填完整
+            if (this.startTime && this.endTime && this.name && this.selectCertificate && this.certificateValue && this.selectRelative && this.phone && this.email) {
+                this.couldSubmit = true;
+            } else {
+                this.couldSubmit = false;
+            }         
+        },
+        infoChange () {   //事件函数
+            console.log(this.startTime , this.endTime , this.name , this.selectCertificate , this.certificateValue , this.selectRelative , this.phone , this.email)
+            console.log(this.couldSubmit);
+            this.checkSubmit();
+        },
+        changePayWay (event) {
+            if (this.balanceChoose) {
+                this.balanceChoose = false;
+                this.bankChoose = true;
+            } else {
+                this.balanceChoose = true;
+                this.bankChoose = false;               
+            }
+        },
         turnBack (event) {
             this.$router.go(-1);
         },
-        onSubmit() {
-            console.log('submit!');
+        toSubmit() {
+            this.$alert('请填写信息', '提示', {
+                confirmButtonText: '确定',
+                callback: action => {
+                    this.$message({
+                    type: 'info',
+                    message: `action: ${ action }`
+                    });
+                }
+            });
         }
       
     }
@@ -244,9 +282,17 @@ export default {
                 line-height: 60px;
                 text-align: center;
             }
-            .time{
+            .data-picker{
                 width: 48%;
-                background-color: #eee;
+                text-align: center;
+                .el-input__inner{
+                    text-align: center;
+                    font-size: 28px;/*px*/
+                }
+                .el-input__inner::placeholder{
+                    text-align: center;
+                    font-size: 28px;/*px*/
+                }
             }
             .striping{
                 width: 4%;
@@ -276,14 +322,15 @@ export default {
                 margin-bottom: 20px;
                 margin-top: 20px;
                 display: flex;
-                span{
+                .name{
                     color: #333;
                     font-size: 30px;/*px*/
                     margin-right: 40px;
                     font-weight: bold;
                 }
-                .el-se-relative{
-                    margin-left: 40px;
+                .el-radio{
+                    vertical-align: middle;
+                    padding-top: 10px;
                 }
             }
         }
@@ -349,8 +396,8 @@ export default {
                     }                 
                 }
                 .bank-right{
-                    width: 30px;
-                    height: 30px;
+                    width: 36px;
+                    height: 36px;
                 }
             }
         }
@@ -359,14 +406,18 @@ export default {
         width: 702px;
         height: 80px;
         margin: 0 auto;
-        background-color: #3399ff;
+        background-color: #eee;
         text-align: center;
         line-height: 80px;
         border-radius: 40px;
-        color: #fff;
+        color: #666;
         font-size: 30px;/*px*/
         font-weight: bold;
         letter-spacing: 8px;
+    }
+    .could{
+        color: #fff;
+        background-color: #3399ff;
     }
 }
 </style>

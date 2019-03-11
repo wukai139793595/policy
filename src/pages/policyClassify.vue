@@ -7,34 +7,34 @@
             <div class="title">请选择保险</div>
         </div>    
         <div class="classify-wrap">
-            <div class="classify-list" v-for="index in 9" :key="index">
+            <div class="classify-list" v-for="(item,index) in policyArr" :key="index">
                 <div class="name-wrap">
-                    <div class="name">个人意外险</div>
+                    <div class="name">{{item.risk_name}}</div>
                     <div class="choose">
-                        <span>{{money}}元/份</span>
-                        <div class="img-wrap">
-                            <img src="../assets/icon/circle.png" alt="" v-if="true">
-                            <img src="../assets/icon/choose-circle.png" alt="" v-else>
+                        <span>{{item.premium | divisionHundred}}元/份</span>
+                        <div class="img-wrap" @click="selectPolicy($event, index)">
+                            <img src="../assets/icon/choose-circle.png" alt="" v-if="item.id === policy_id">
+                            <img src="../assets/icon/circle.png" alt="" v-else>
                         </div>
                     </div>
                 </div>
                 <div class="info-wrap">
                     <span class="policy-duration">
                         险期：
-                        <span>{{'1-3'}}天</span>
+                        <span>{{`${item.periodmin}-${item.periodmax}`}}天</span>
                     </span>
                     <span class="policy-sum">
                         保额：
-                        <span>{{1000}}元</span>
+                        <span>{{item.amount}}元</span>
                     </span>
                 </div>
             </div>
         </div>    
         <div class="protocols-submit">
             <div class="protocols-wrap">
-                <div class="img-wrap">
-                    <img src="../assets/icon/square.png" alt="" v-if="false">
-                    <img src="../assets/icon/choose-square.png" alt="" v-else>
+                <div class="img-wrap" @click="changeAgree($event)">
+                    <img src="../assets/icon/square.png" alt="" v-if="!agreePolicyProtocols">
+                    <img src="../assets/icon/choose-square.png" alt="" v-if="agreePolicyProtocols">
                 </div>
                 <div class="protocols">
                     我已阅读
@@ -45,7 +45,7 @@
                 确定
             </div>
         </div>
-        <div class="protocols-detail" v-if='isShowProtocols'>
+        <div class="protocols-detail" v-if='showPolicyProtocols'>
             <div class="content">
                 <div class="close-wrap">
                     <img src="../assets/icon/close.png" alt="" @click="hideProtocols($event)">
@@ -59,10 +59,54 @@
 </template>
 <script>
 import {mapState, mapMutations} from 'vuex'
+import {postInsuranceClassify} from '@/api/api.js'
 export default {
     data () {
         return {
-            isShowProtocols: false
+            showPolicyProtocols: false,//显示保险协议
+            agreePolicyProtocols: false,//是否同意保险协议
+            policyArr: [ {
+            "id":"1",  //险种id
+            "risk_code":"EAA",  //险种代码
+            "risk_name":"个人意外险",  //险种名字
+            "periodmin":"1",  //保险最小期限
+            "amount":"200600", //保额
+            "premium":"1000",  //保险费
+            "periodmax":"3",  //保险最大期限
+            "ROW_NUMBER":"1" 
+        },
+        {
+            "id":"2",
+            "risk_code":"EAA",
+            "risk_name":"个人意外险",
+            "periodmin":"4",
+            "amount":"200600",
+            "premium":"1500",
+            "periodmax":"5",
+            "ROW_NUMBER":"2"
+        },
+        {
+            "id":"3",
+            "risk_code":"EAA",
+            "risk_name":"个人意外险",
+            "periodmin":"6",
+            "amount":"200600",
+            "premium":"2000",
+            "periodmax":"7",
+            "ROW_NUMBER":"3"
+        },
+        {
+            "id":"4",
+            "risk_code":"EAC",
+            "risk_name":"团体意外险",
+            "periodmin":"1",
+            "amount":"120600",
+            "premium":"450",
+            "periodmax":"3",
+            "ROW_NUMBER":"4"
+        }],
+            policy_id: '',
+            selected_index: 0  //选择的序号
         }
     },
     computed: {
@@ -70,21 +114,62 @@ export default {
     },
     methods: {
         ...mapMutations(['changeMoney']) ,
+        // 获取保险种类信息
+        getInfo () {
+            postInsuranceClassify()
+            .then((res) => {
+                console.log(res)
+                if (res.data.errcode === 0) {
+                    this.policyArr = res.data.list;
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        },
+        initData () {
+            this.getInfo();
+        },
+        // 选择保险种类
+        selectPolicy (event, index) {
+            this.policy_id = this.policyArr[index].id;
+            this.selectedIndex = index;
+        },
+        // 选择是否同意保险协议
+        changeAgree (event) {
+            this.agreePolicyProtocols = !this.agreePolicyProtocols;
+        },
         showProtocols (event) {
-            this.isShowProtocols = true;
+            this.showPolicyProtocols = true;
             this.changeMoney(10);
         },
         hideProtocols (event) {
-            this.isShowProtocols = false;
+            this.showPolicyProtocols = false;
         },
         toSelectPerson (event) {
-            this.$router.push({
-                path: '/selectPerson'
-            })
+            if(this.agreePolicyProtocols) {
+                this.$router.push({
+                    path: '/selectPerson',
+                    query: {
+                        oneCost: this.policyArr[this.selected_index].premium
+                    }
+                })
+            }else{
+                console.log('您未同意保险协议')
+            }
         },
         turnBack (event) {
             this.$router.go(-1);
         }
+    },
+    filters: {
+        divisionHundred (value) {
+            return (Number(value)/100).toFixed(2);
+        }
+    },
+    created() {
+        console.log(111);
+        this.initData();
     }
 }
 </script>
@@ -114,13 +199,13 @@ export default {
         }
         .title{
             display: inline-block;
-            font-size: 30px;/*px*/
+            font-size: 34px;/*px*/
         }
     }   
     .classify-wrap{
         width: 702px;
         box-sizing: border-box;
-        padding: 50px 20px 0 20px;
+        padding: 50px 20px 180px 20px;
         margin: 0 auto;
         .classify-list{
             width: 100%;
@@ -133,7 +218,8 @@ export default {
                 margin-bottom: 10px;
                 justify-content: space-between;
                 .name{
-                    font-size: 30px; /*px*/
+                    font-size: 34px; /*px*/
+                    font-weight: 500;
                     color: #333;
                 }
                 .choose{
@@ -148,13 +234,18 @@ export default {
                             vertical-align: middle;
                         }
                     }
+                    span{
+                        font-size: 34px; /*px*/
+                        font-weight: 500;
+                        color: #333;
+                    }
                 }
             }
             .info-wrap{
                 width: 100%;
                 color: #999;
                 text-align: left;
-                font-size: 24px; /*px*/
+                font-size: 28px; /*px*/
                 .policy-duration{
                     margin-right: 20px;
                 }
@@ -186,7 +277,7 @@ export default {
             .protocols{
                 display: inline-block;
                 margin-left: 30px;
-                font-size: 26px;/*px*/
+                font-size: 30px;/*px*/
                 letter-spacing: 4px;
                 span{
                     display: inline-block;
@@ -205,7 +296,7 @@ export default {
             line-height: 80px;
             border-radius: 40px;
             color: #fff;
-            font-size: 30px;/*px*/
+            font-size: 34px;/*px*/
             font-weight: bold;
             letter-spacing: 8px;
         }

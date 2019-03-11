@@ -8,14 +8,14 @@
         </div>
         <scroll @refresh="refresh" @loadmore="loadmore">
             <div class="group-wrap">
-                <div class="group-list" v-for="index in initNum" :key="index">
+                <div class="group-list" v-for="(item,index) in groupArr" :key="index">
                     <div class="name-wrap">
                         <div class="group-name">
-                            少儿围棋一组
+                            {{item.groupname}}
                         </div>
                         <div class="group-info">
-                            <span>总人数：{{'50'}}人，</span>
-                            <span>未交保险：{{'50'}}人</span>
+                            <span>总人数：{{item.apply}}人，</span>
+                            <span>未交保险：{{item.apply-item.policy}}人</span>
                         </div>
                     </div>
                     <div class="buy-btn" @click="toBuyPolicy($event, index)">
@@ -27,23 +27,66 @@
     </div>
 </template>
 <script>
-import Scroll from '../components/scroll.vue'
+import Scroll from '@/components/scroll.vue'
+import {postGroup} from '@/api/api.js'
 export default {
     data () {
         return {
-            initNum: 0
+            page: 1, //当前加载到第几页
+            limit: 11,
+            groupArr:[{
+          "event_group_id":"20058", //小组id
+          "groupname":"I",  //小组名
+          "ROW_NUMBER":"1",
+          "apply":3,  //报名人数
+          "policy":1  //已保险人数
+          },
+          {
+          "event_group_id":"20059",
+          "groupname":"甲组",
+          "ROW_NUMBER":"2",
+          "apply":0,
+          "policy":0
+          }],
+            total: 0,
+            totalPage: 1
         }
     },
     methods: {
         initData () {
-            this.initNum = 11;
+            this.getInfo();
         },
+        // 获取赛事小组
+        getInfo () {
+            postGroup({
+                event_id: '4368',
+                page: this.page,
+                limit: this.limit
+            })
+            .then((res) => {
+                var data = res.data.list;
+                this.total = res.data.total;
+                this.totalPage = res.data.totalPage;
+                this.groupArr.push(...data);                
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+        },
+        // 下拉刷新
         refresh () {
+            this.groupArr = [];
             this.initData();
         },
+        //上拉加载
         loadmore (func) {
-            this.initNum += 9;
-            func();
+            if(this.groupArr.length >= this.total) {
+                func(true);
+            }else{
+                this.page += 1;
+                this.getInfo();
+                func();
+            }
         },
         toBuyPolicy (event, index) {
             this.$router.push({
@@ -58,7 +101,7 @@ export default {
         Scroll
     },
     created () {
-        this.initData();
+        // this.initData();
     }
 }
 </script>
@@ -87,7 +130,7 @@ export default {
         }
         .title{
             display: inline-block;
-            font-size: 30px;/*px*/
+            font-size: 34px;/*px*/
         }
     }
     .group-wrap{
@@ -105,10 +148,10 @@ export default {
                 text-align: left;
                 .group-name{
                     color: #333;
-                    font-size: 30px; /*px*/
+                    font-size: 34px; /*px*/
                 }
-                .group-inf{
-                    font-size: 24px; /*px*/
+                .group-info{
+                    font-size: 28px; /*px*/
                     span{
                         color: #999;
                     }
@@ -118,7 +161,7 @@ export default {
                 width: 100px;
                 height: 40px;
                 line-height: 40px;
-                font-size: 26px;/*px*/
+                font-size: 28px;/*px*/
                 background-color: #3399ff;
                 color: #fff;
                 font-weight: bold;

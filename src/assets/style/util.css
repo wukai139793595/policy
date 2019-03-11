@@ -10,8 +10,9 @@ li{
     list-style: none;
 }
 .icon-common{
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
+
 }
 .head{
     width: 702px;
@@ -40,6 +41,8 @@ li{
     height: 100%;
 }
 
+
+/* 日历样式改写 */
 div.el-popper{
     width: 500px;
     height: 500px;
@@ -62,4 +65,12 @@ span.el-input__prefix{
 }
 .el-picker-panel__body-wrapper .el-date-table td span{
     border-radius: 0;
+}
+
+/* 下拉框样式改写 */
+.el-scrollbar__view .el-select-dropdown__item{
+    margin: 10px 0;
+}
+.el-scrollbar__view .el-select-dropdown__item span{
+    font-size: 30px;/*px*/
 }

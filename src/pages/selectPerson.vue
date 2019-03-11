@@ -11,27 +11,31 @@
             <input class="input" type="text" placeholder="搜索">
         </div>
         <div class="person-wrap">
-            <div class="person-list" v-for="index in 9" :key="index">
+            <div class="person-list" v-for="(item,index) in noPolicyPerson" :key="index">
                 <div class="img-wrap">
-                    <img src="../assets/icon/square.png" alt="">
+                    <div class="img-box" @click="selectPerson($event, index)">
+                        <img src="../assets/icon/choose-square.png" alt="" v-if="selectedPerson.indexOf(item.idcard) > -1">
+                        <img src="../assets/icon/square.png" alt="" v-else>
+                    </div>
                     <div class="name-wrap">
-                        <div>{{"戴安娜"}}</div>
-                        <div>身份证：{{"36545*****6456"}}</div>
+                        <div>{{item.name}}</div>
+                        <div>身份证：{{item.idcard | identifiHide}}</div>
                     </div>
                 </div>
                 <div class="money-wrap">
-                    需交：<span>{{"10"}}元</span>
+                    需交：<span>{{oneCost | divisionHundred}}元</span>
                 </div>
             </div>
         </div>
         <div class="submit-wrap">
-            <div class="select-all">
-                <img src="../assets/icon/square.png" alt="">
+            <div class="select-all" @click="selectAll($event)">
+                <img src="../assets/icon/choose-square.png" alt="" v-if="isSelectAll">
+                <img src="../assets/icon/square.png" alt="" v-else>
                 <span>全选</span>
             </div>
             <div class="select-info">
-                <span>已选：{{"0"}}人</span>
-                <span>合计：{{"0"}}元</span>
+                <span>已选：{{selectedPerson.length}}人</span>
+                <span>合计：{{selectedPerson.length | totalMoney(oneCost)}}元</span>
             </div>
             <div class="submit" @click="toWriteInfo($event)">
                 购买
@@ -40,8 +44,82 @@
     </div>
 </template>
 <script>
+import {postNoPolicyPerson} from '@/api/api.js'
 export default {
+    data () {
+        return {
+            selectedPerson: [],   //客户选择要保险的人员
+            oneCost: 0,           //没份保险金额，需除以100
+            noPolicyPerson: [{    //为保险人员集合
+
+                    "group_id": 20058,
+                    "name": "阿萨德",
+                    "tel": "13666698009",
+                    "idcard": "asd4342323",
+                    "row_number": "1"
+                },
+                {
+                    "group_id": 20058,
+                    "name": "叶晓飞",
+                    "tel": "13478670738",
+                    "idcard": "332521197703260239",
+                    "row_number": "2"
+                }],
+            isSelectAll: false      //是否全选
+        }
+    },
     methods: {
+        // 获取赛事小组未保险人员
+        getInfo () {
+            postNoPolicyPerson({
+                group_id: '20058'  //注：正式应改成参数
+            })
+            .then((res) => {
+                console.log(res);
+                if (res.data.errcode === 0) {
+                   
+                    this.noPolicyPerson = res.data.list
+                }else {
+                    console.log('网络错误')
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+        },
+        initData() {
+            this.getInfo();
+            this.oneCost = this.$route.query.oneCost;
+
+        },
+        selectPerson (event, index) {  //选择单个人
+            let person = this.noPolicyPerson[index].idcard;
+            let i = this.selectedPerson.indexOf(person);
+            if (i === -1) {
+                this.selectedPerson.push(person);
+                if (this.selectedPerson.length === this.noPolicyPerson.length) {
+                    this.isSelectAll = true;
+                }
+                
+            } else {
+                this.selectedPerson.splice(i, 1);
+                this.isSelectAll = false;
+                
+            }
+        },
+        selectAll (event) {   //选择全部
+            if (!this.isSelectAll) {
+                let tempArr = [];
+                this.noPolicyPerson.forEach((ele, ind) => {
+                    tempArr.push(ele.idcard);
+                })
+                this.selectedPerson = tempArr;
+                this.isSelectAll = true;
+            } else {
+                this.selectedPerson = [];
+                this.isSelectAll = false;
+            }
+        },
         toWriteInfo (event) {
             this.$router.push({
                 path: '/writeInfo'
@@ -50,6 +128,25 @@ export default {
         turnBack (event) {
             this.$router.go(-1);
         }
+    },
+    filters: {
+        divisionHundred (value) {   //没分金额要除以100
+            return (Number(value)/100).toFixed(2);
+        },
+        totalMoney (value, oneCost) {   //合计金额
+            console.log(oneCost);
+            return  (Number(oneCost)/100).toFixed(2) * value
+        },
+        identifiHide (value) {
+            let temp = '';
+            if(value && value.length > 4) {
+                temp = value.substr(0, 2) + '******' + value.substr(-2, value.length);
+            }
+            return temp;
+        }
+    },
+    created () {
+        this.initData();
     }
 }
 </script>
@@ -87,6 +184,7 @@ export default {
     .person-wrap{
         width: 702px;
         margin: 0 auto;
+        padding-bottom: 80px;
         .person-list{
             width: 100%;
             display: flex;
@@ -94,28 +192,33 @@ export default {
             margin-bottom: 50px;
             .img-wrap{
                 display: flex;
-                img{
-                    width:30px;
+                .img-box{
+                    width: 30px;
                     height: 30px;
-                    position: relative;
-                    top: 4px;
+
+                    img{
+                        width:30px;
+                        height: 30px;
+                        position: relative;
+                        top: 4px;
+                    }
                 }
                 .name-wrap{
                     margin-left: 20px;
                     div:nth-of-type(1) {
-                        font-size: 30px; /*px*/
+                        font-size: 34px; /*px*/
                         color: #333;
                         margin-bottom: 8px;
                     }
                     div:nth-of-type(2) {
-                        font-size: 24px; /*px*/
+                        font-size: 28px; /*px*/
                         color: #666;
                     }
                 }
             }
             .money-wrap{
                 color: #666;
-                font-size: 28px; /*px*/
+                font-size: 32px; /*px*/
                 span{
                     color: #3399ff;
                     font-weight: bold;
@@ -124,11 +227,11 @@ export default {
         }
     }
     .submit-wrap{
-        width: 100%;
+        width: 750px;
         height: 100px;
         padding-left: 28px;
         box-sizing: border-box;
-        position: fixed;
+        position: absolute;
         bottom: 0;
         left: 0;
         display: flex;
@@ -142,13 +245,13 @@ export default {
                 height: 30px;
             }
             span{
-                font-size: 30px;/*px*/
+                font-size: 32px;/*px*/
             }
         }
         .select-info{
             margin-left: -40px;
             span{
-                font-size: 24px;/*px*/
+                font-size: 26px;/*px*/
             }
         }
         .submit{
@@ -157,7 +260,7 @@ export default {
             background-color: #3399ff;
             line-height: 100px;
             text-align: center;
-            font-size: 30px; /*px*/
+            font-size: 32px; /*px*/
             color: #fff;
             font-weight: bold;
         }
