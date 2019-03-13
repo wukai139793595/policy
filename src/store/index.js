@@ -3,7 +3,9 @@ import Vue from 'vue'
 Vue.use(Vuex)
 let store = new Vuex.Store({
     state: {
-        money: 20,
+        groupId: '',
+        // tempArr: [],
+        selectArr: [],
         policyInfo: {
             classifyList: [],
             nameList: [],
@@ -12,9 +14,15 @@ let store = new Vuex.Store({
         }
     },
     mutations: {
-        changeMoney (state, num) {
-            state.money += num
+        changeUser (state, newArr) {
+            state.selectArr = newArr;
+
         },
+        // changeTemp (state, newArr) {
+        //     state.tempArr = newArr;
+        //     console.log('newArr',newArr)
+        //     console.log(state.tempArr)
+        // },
         changeClassify (state, newArr) {
             state.classifyList = newArr
         },

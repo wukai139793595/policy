@@ -35,7 +35,7 @@
             <div class="info-content">               
                 <div class="name-wrap">
                     <span class="name">姓名</span>
-                    <input type="text" placeholder="输入投保人姓名" @change="infoChange" v-model="name">
+                    <input type="text" placeholder="输入投保人姓名" @change="infoChange" v-model="name" >
                 </div>
                 <div class="identify-wrap">
                     <span class="name">证件类型</span>
@@ -86,7 +86,7 @@
                         <img class="pay-icon" src="../assets/icon/money@2x.png" alt="">
                         <div class="balance-hint">
                             <div class="balance-word">余额支付</div>
-                            <div class="hint">可用额度<span>{{'1000'}}元</span></div>
+                            <div class="hint">可用额度<span>{{wallet}}元</span></div>
                         </div>
                     </div>
                     <div class="balance-right" @click="changePayWay($event)">
@@ -115,10 +115,12 @@
     </div>
 </template>
 <script>
-import {postWallet} from '@/api/api.js'
+import {postWallet, postCreateOrder, postPay, postCcbPay} from '@/api/api.js'
+import {checkName,checkPhone,checkEmail,checkIdcard} from '@/util/index.js'
 export default {
     data () {
         return {
+            wallet: 0,
             sex: '0',
             balanceChoose: true,
             bankChoose: false,
@@ -196,8 +198,8 @@ export default {
             }         
         },
         infoChange () {   //事件函数
-            console.log(this.startTime , this.endTime , this.name , this.selectCertificate , this.certificateValue , this.selectRelative , this.phone , this.email)
-            console.log(this.couldSubmit);
+            // console.log(this.startTime , this.endTime , this.name , this.selectCertificate , this.certificateValue , this.selectRelative , this.phone , this.email)
+            // console.log(this.couldSubmit);
             this.checkSubmit();
         },
         changePayWay (event) {
@@ -212,18 +214,132 @@ export default {
         turnBack (event) {
             this.$router.go(-1);
         },
-        toSubmit() {
-            this.$alert('请填写信息', '提示', {
-                confirmButtonText: '确定',
-                callback: action => {
-                    this.$message({
-                    type: 'info',
-                    message: `action: ${ action }`
-                    });
+        checkInfoCorrect () {
+            if (!checkName(this.name)) {
+                this.$message.error('请输入正确的中文名字')
+                return
+            }            
+            if (!checkIdcard(this.certificateValue)) {
+                this.$message.error('请输入正确的身份证号')
+                return
+            }
+            if(!checkPhone(this.phone)) {
+                this.$message.error('请输入正确的手机号');
+                return 
+            }
+            if(!checkEmail(this.email)) {
+                this.$message.error('请输入正确的邮箱');
+                return                 
+            }
+        },
+        createOrder () {    
+            var that = this;
+            var users = new Array(this.selectArr.length);
+            this.selectArr.forEach((ele, ind) => {
+                users[ind] = {
+                    name: ele.name,
+                    id_card: ele.idcard,
+                    type: 1,
+                    tel: ele.tel
                 }
-            });
+            })
+            var data = {
+                ssid: 'e9hbliskas76gss1oh24l2hui4',
+                org_id: 1,
+                entrance: 1,
+                event_group_id: this.$route.query.groupId,
+                id: this.$route.query.policyId,
+                begin_time: this.startTime,
+                end_time: this.endTime,
+                users: users,
+                applicant: {
+                    id_card_name: this.name,
+                    id_card: this.certificateValue,
+                    tel: this.phone,
+                    email: this.email,
+                    type: this.selectCertificate,
+                    sex: this.sex,
+                    relation: this.selectRelative
+                }
+            };
+            //创建订单
+            postCreateOrder(data)
+            .then((res) => {
+                console.log('createPay',res)
+                if (res.data.errcode === 0) {
+                    if (this.balanceChoose) {
+                        return postPay({
+                            order_id: res.data.order_id,
+                            ssid: 'e9hbliskas76gss1oh24l2hui4'
+                        })
+                    } else {
+                        return postCcbPay({
+                            order_id: res.data.order_id,
+                            ssid: 'e9hbliskas76gss1oh24l2hui4'                           
+                        })
+                    }
+                } else {
+                    this.$message.error(res.data.msg);
+                }
+            },(err) => {
+                this.$message.erro('网络错误')
+            })
+            //支付网络请求返回
+            .then((res) => {
+                console.log('payres',res)
+                if (res.data.errcode === 0) {
+                    // this.$message({
+                    //     message: '支付成功',
+                    //     type: 'success'
+                    // })
+                    if (this.balanceChoose) {
+                        this.$store.commit('changeUser',[]);  //支付成功后清除数据
+                        this.$alert('余额支付成功', '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.$router.push({
+                                    path: '/policy'
+                                })
+                            }
+                        }); 
+                    }else if (this.bankChoose){
+
+                    }
+                   
+                } else {
+                    this.$message.error('支付失败')
+                }
+            })
+        },
+        toSubmit() {
+            this.createOrder();
+            // if (!this.couldSubmit) {   //判断信息是否输入完整
+            //     return
+            // }
+            // this.checkInfoCorrect();
+
         }
       
+    },
+    computed: {
+        selectArr () {
+            return this.$store.state.selectArr
+        }
+    },
+    created () {
+        postWallet({
+            org_id: 32,
+            ssid: 'e9hbliskas76gss1oh24l2hui4',
+            entrance: 1
+        })
+        .then((res) => {
+            if (res.data.errcode === 0) {
+                this.wallet = res.data.rows
+            }
+        })
+        .catch((err) => {
+            this.$message.err('网络错误')
+        })
     }
 }
 </script>

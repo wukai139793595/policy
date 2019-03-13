@@ -4,7 +4,7 @@
             <div class="turn-back">
                 <img src="../assets/icon/left-direction.png" alt="" @click="turnBack($event)">
             </div>
-            <div class="title">请选择保险</div>
+            <div class="title">请选择被保险的名单</div>
         </div> 
         <div class="search-wrap">
             <img src="../assets/icon/search-icon.png" alt="">
@@ -14,7 +14,7 @@
             <div class="person-list" v-for="(item,index) in noPolicyPerson" :key="index">
                 <div class="img-wrap">
                     <div class="img-box" @click="selectPerson($event, index)">
-                        <img src="../assets/icon/choose-square.png" alt="" v-if="selectedPerson.indexOf(item.idcard) > -1">
+                        <img src="../assets/icon/choose-square.png" alt="" v-if="tempSelect.indexOf(index) > -1">
                         <img src="../assets/icon/square.png" alt="" v-else>
                     </div>
                     <div class="name-wrap">
@@ -34,8 +34,8 @@
                 <span>全选</span>
             </div>
             <div class="select-info">
-                <span>已选：{{selectedPerson.length}}人</span>
-                <span>合计：{{selectedPerson.length | totalMoney(oneCost)}}元</span>
+                <span>已选：{{selectArr.length}}人</span>
+                <span>合计：{{selectArr.length | totalMoney(oneCost)}}元</span>
             </div>
             <div class="submit" @click="toWriteInfo($event)">
                 购买
@@ -48,9 +48,9 @@ import {postNoPolicyPerson} from '@/api/api.js'
 export default {
     data () {
         return {
-            selectedPerson: [],   //客户选择要保险的人员
+            tempSelect: [],
             oneCost: 0,           //没份保险金额，需除以100
-            noPolicyPerson: [{    //为保险人员集合
+            noPolicyPerson: [{    //未保险人员集合
 
                     "group_id": 20058,
                     "name": "阿萨德",
@@ -68,6 +68,11 @@ export default {
             isSelectAll: false      //是否全选
         }
     },
+    computed: {
+        selectArr() {    //客户选择要保险的人员
+            return this.$store.state.selectArr
+        }
+    },
     methods: {
         // 获取赛事小组未保险人员
         getInfo () {
@@ -75,16 +80,15 @@ export default {
                 group_id: '20058'  //注：正式应改成参数
             })
             .then((res) => {
-                console.log(res);
                 if (res.data.errcode === 0) {
                    
                     this.noPolicyPerson = res.data.list
                 }else {
-                    console.log('网络错误')
+                    this.$message.error(res.data.msg)
                 }
             })
             .catch((err) => {
-                console.log(err)
+                this.$message.error('网络错误')
             })
         },
         initData() {
@@ -92,61 +96,91 @@ export default {
             this.oneCost = this.$route.query.oneCost;
 
         },
-        selectPerson (event, index) {  //选择单个人
-            let person = this.noPolicyPerson[index].idcard;
-            let i = this.selectedPerson.indexOf(person);
-            if (i === -1) {
-                this.selectedPerson.push(person);
-                if (this.selectedPerson.length === this.noPolicyPerson.length) {
-                    this.isSelectAll = true;
-                }
-                
+        selectPerson (event, index) {  //选择单个人操作
+            let person = this.noPolicyPerson[index];
+            let flag = false;   //是否已经选中
+            let i = -1;
+
+            if (this.tempSelect.indexOf(index) > -1) {
+                i = this.tempSelect.indexOf(index);
+                this.selectArr.splice(i, 1);
+                this.tempSelect.splice(i,1);
+                this.isSelectAll = false;  
+                this.$store.commit('changeUser', this.selectArr);             
             } else {
-                this.selectedPerson.splice(i, 1);
-                this.isSelectAll = false;
-                
+                this.selectArr.push(person);
+                this.tempSelect.push(index);
+                this.$store.commit('changeUser', this.selectArr); 
+                if (this.selectArr.length === this.noPolicyPerson.length) {
+                    this.isSelectAll = true;
+                }               
             }
         },
-        selectAll (event) {   //选择全部
+        selectAll (event) {   //选择全部操作
             if (!this.isSelectAll) {
                 let tempArr = [];
+                this.tempSelect = [];
                 this.noPolicyPerson.forEach((ele, ind) => {
-                    tempArr.push(ele.idcard);
+                    tempArr.push(ele);
+                    this.tempSelect.push(ind);
                 })
-                this.selectedPerson = tempArr;
+                this.$store.commit('changeUser', tempArr)
                 this.isSelectAll = true;
             } else {
-                this.selectedPerson = [];
+                this.tempSelect = [];
+                this.$store.commit('changeUser', [])
                 this.isSelectAll = false;
             }
         },
         toWriteInfo (event) {
+            if (!this.selectArr.length) {
+                this.$message('您还未选择要保险的名单');
+                return
+            }
             this.$router.push({
-                path: '/writeInfo'
+                path: '/writeInfo',
+                query: {
+                    oneCost: this.$route.query.oneCost,
+                    groupId: this.$route.query.groupId,
+                    policyId: this.$route.query.policyId
+                }
             })
         },
         turnBack (event) {
+            this.$store.commit('changeUser',[]);
             this.$router.go(-1);
         }
+    },
+    created () {
+        
+        this.$store.commit('changeUser',[])
+        console.log("selectPerson:selectArr",this.selectArr);
+        this.initData();
     },
     filters: {
         divisionHundred (value) {   //没分金额要除以100
             return (Number(value)/100).toFixed(2);
         },
         totalMoney (value, oneCost) {   //合计金额
-            console.log(oneCost);
             return  (Number(oneCost)/100).toFixed(2) * value
         },
-        identifiHide (value) {
+        identifiHide (value) {     //身份证显示****
             let temp = '';
             if(value && value.length > 4) {
                 temp = value.substr(0, 2) + '******' + value.substr(-2, value.length);
             }
             return temp;
         }
-    },
-    created () {
-        this.initData();
+        
+        // ,hasSelect (value) {
+        //     var len = this.selectArr.length;
+        //     for (let i = len ; i < len ; i ++) {
+        //         if (this.selectArr[i].idcard === value) {
+        //             return true
+        //         }
+        //     }
+        //     return false
+        // }
     }
 }
 </script>

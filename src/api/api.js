@@ -30,6 +30,11 @@ export const postGroup = (params) => {return post('/index/index/group', params)}
 export const postNoPolicyPerson = (params) => {return post('/index/index/noPolicy', params)};
 // 获取保险种类
 export const postInsuranceClassify = (params) => {return post('/index/index/getRisk',params)};
-
 // 钱包余额
 export const postWallet = (params) => {return post('/index/index/wellet',params)}
+// 创建订单
+export const postCreateOrder = (params) => {return post('/index/index/createOrder', params)}
+// 余额支付
+export const postPay = (params) => {return post('/index/index/pay', params)}
+// 建行支付
+export const postCcbPay = (params) => {return post('/pay/ccb', params)}

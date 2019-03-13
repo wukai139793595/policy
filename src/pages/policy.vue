@@ -35,19 +35,19 @@ export default {
             page: 1, //当前加载到第几页
             limit: 11,
             groupArr:[{
-          "event_group_id":"20058", //小组id
-          "groupname":"I",  //小组名
-          "ROW_NUMBER":"1",
-          "apply":3,  //报名人数
-          "policy":1  //已保险人数
-          },
-          {
-          "event_group_id":"20059",
-          "groupname":"甲组",
-          "ROW_NUMBER":"2",
-          "apply":0,
-          "policy":0
-          }],
+                "event_group_id":"20058", //小组id
+                "groupname":"I",  //小组名
+                "ROW_NUMBER":"1",
+                "apply":3,  //报名人数
+                "policy":1  //已保险人数
+                },
+                {
+                "event_group_id":"20059",
+                "groupname":"甲组",
+                "ROW_NUMBER":"2",
+                "apply":0,
+                "policy":0
+           }],
             total: 0,
             totalPage: 1
         }
@@ -59,18 +59,23 @@ export default {
         // 获取赛事小组
         getInfo () {
             postGroup({
-                event_id: '4368',
+                event_id: '4368',   //需替换成参数
                 page: this.page,
                 limit: this.limit
             })
             .then((res) => {
-                var data = res.data.list;
-                this.total = res.data.total;
-                this.totalPage = res.data.totalPage;
-                this.groupArr.push(...data);                
+                console.log("policy",res)
+                if (res.data.errcode === 0) {
+                    var data = res.data.list;
+                    this.total = res.data.total;
+                    this.totalPage = res.data.totalPage;
+                    this.groupArr.push(...data);                
+                }else {
+                    this.$message.error(res.data.msg)
+                }
             })
             .catch((err) => {
-                console.log(err)
+                this.$message.error('网络错误')
             })
         },
         // 下拉刷新
@@ -89,10 +94,11 @@ export default {
             }
         },
         toBuyPolicy (event, index) {
+            var groupId = this.groupArr[index].event_group_id;
             this.$router.push({
                 path: '/policyClassify',
                 query: {
-                    groupId: '1'
+                    groupId: groupId
                 }
             })
         }
@@ -101,7 +107,7 @@ export default {
         Scroll
     },
     created () {
-        // this.initData();
+        this.initData();
     }
 }
 </script>
