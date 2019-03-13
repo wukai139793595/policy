@@ -15,7 +15,8 @@ let post = function (url, params) {
             url: url,
             data: Qs.stringify(params),
             header: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                'Cookie': 'e9hbliskas76gss1oh24l2hui4'
             }
         }).then(res => {
             resolve(res);

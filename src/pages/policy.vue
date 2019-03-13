@@ -33,7 +33,10 @@ export default {
     data () {
         return {
             page: 1, //当前加载到第几页
-            limit: 11,
+            limit: 12,
+            total: 0,  //总数量
+            totalPage: 1, //总页数
+            isClock: false, //网络请求锁 
             groupArr:[{
                 "event_group_id":"20058", //小组id
                 "groupname":"I",  //小组名
@@ -47,23 +50,20 @@ export default {
                 "ROW_NUMBER":"2",
                 "apply":0,
                 "policy":0
-           }],
-            total: 0,
-            totalPage: 1
+           }]
         }
     },
     methods: {
-        initData () {
-            this.getInfo();
-        },
         // 获取赛事小组
-        getInfo () {
+        initData () {
+            this.isClock = true;
             postGroup({
-                event_id: '4368',   //需替换成参数
+                event_id: '1620',   //需替换成参数
                 page: this.page,
                 limit: this.limit
             })
             .then((res) => {
+                this.isClock = false;
                 console.log("policy",res)
                 if (res.data.errcode === 0) {
                     var data = res.data.list;
@@ -80,6 +80,7 @@ export default {
         },
         // 下拉刷新
         refresh () {
+            this.page = 1;
             this.groupArr = [];
             this.initData();
         },
@@ -88,8 +89,10 @@ export default {
             if(this.groupArr.length >= this.total) {
                 func(true);
             }else{
-                this.page += 1;
-                this.getInfo();
+                if (!this.isClock) {
+                    this.page += 1;
+                    this.initData();
+                }
                 func();
             }
         },

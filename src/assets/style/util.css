@@ -66,7 +66,9 @@ span.el-input__prefix{
 .el-picker-panel__body-wrapper .el-date-table td span{
     border-radius: 0;
 }
-
+.el-date-editor .el-input__inner{
+    margin-left: 0;
+}
 /* 下拉框样式改写 */
 .el-scrollbar__view .el-select-dropdown__item{
     margin: 10px 0;

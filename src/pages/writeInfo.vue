@@ -136,16 +136,16 @@ export default {
             couldSubmit: false,
             certificateArr:[   //证件类型
                 {
-                    num: 1,
+                    num: '1',
                     type: '身份证'
                 },{
-                    num: 3,
+                    num: '3',
                     type: '护照'
                 },{
-                    num: 10,
+                    num: '10',
                     type: '港澳通行证'
                 },{
-                    num: 26,
+                    num: '26',
                     type: '台湾居民来往内地通行证'
                 }
                 // 1:身份证,3:护照,10:港澳通行证,26:台湾居民来往内地通行证
@@ -153,40 +153,45 @@ export default {
 
             relativeArr: [    //投保人与被投保人关系
                 {
-                    num: 0,
+                    num: '0',
                     type: '本人'
                 },
                 {
-                    num: 1,
+                    num: '1',
                     type: '配偶'
                 },
                 {
-                    num: 2,
+                    num: '2',
                     type: '父母'
                 },
                 {
-                    num: 3,
+                    num: '3',
                     type: '子女'
                 },
                 {
-                    num: 5,
+                    num: '5',
                     type: '兄弟姐妹'
                 },
                 {
-                    num: 6,
+                    num: '6',
                     type: '祖父母、外祖父母'
                 },
                 {
-                    num: 7,
+                    num: '7',
                     type: '雇佣'
                 },
                 {
-                    num: 9,
+                    num: '9',
                     type: '其他'
                 }
                 // 0—本人,1—配偶,2—父母,3—子女,5—兄弟姐妹,6—祖父母、外祖父母,7—雇佣,9—其他
             ]
 
+        }
+    },
+    computed: {
+        totalMoney () {
+            return this.$store.state.totalMoney;
         }
     },
     methods: {
@@ -197,16 +202,20 @@ export default {
                 this.couldSubmit = false;
             }         
         },
-        infoChange () {   //事件函数
+        infoChange () {   //内容改变事件函数
             // console.log(this.startTime , this.endTime , this.name , this.selectCertificate , this.certificateValue , this.selectRelative , this.phone , this.email)
             // console.log(this.couldSubmit);
             this.checkSubmit();
         },
-        changePayWay (event) {
+        changePayWay (event) {   //改变支付渠道
             if (this.balanceChoose) {
                 this.balanceChoose = false;
                 this.bankChoose = true;
             } else {
+                if (this.wallet < this.totalMoney) {
+                    this.$message('钱包余额不足');
+                    return 
+                }
                 this.balanceChoose = true;
                 this.bankChoose = false;               
             }
@@ -214,25 +223,26 @@ export default {
         turnBack (event) {
             this.$router.go(-1);
         },
-        checkInfoCorrect () {
+        checkInfoCorrect () {   //校验用户填写的信息格式是否正确
             if (!checkName(this.name)) {
                 this.$message.error('请输入正确的中文名字')
-                return
+                return false
             }            
-            if (!checkIdcard(this.certificateValue)) {
+            if (this.selectCertificate == '1' && !checkIdcard(this.certificateValue)) {
                 this.$message.error('请输入正确的身份证号')
-                return
+                return false
             }
             if(!checkPhone(this.phone)) {
                 this.$message.error('请输入正确的手机号');
-                return 
+                return false
             }
             if(!checkEmail(this.email)) {
                 this.$message.error('请输入正确的邮箱');
-                return                 
+                return false                
             }
+            return true;
         },
-        createOrder () {    
+        createOrder () {     //创建订单函数
             var that = this;
             var users = new Array(this.selectArr.length);
             this.selectArr.forEach((ele, ind) => {
@@ -288,10 +298,6 @@ export default {
             .then((res) => {
                 console.log('payres',res)
                 if (res.data.errcode === 0) {
-                    // this.$message({
-                    //     message: '支付成功',
-                    //     type: 'success'
-                    // })
                     if (this.balanceChoose) {
                         this.$store.commit('changeUser',[]);  //支付成功后清除数据
                         this.$alert('余额支付成功', '提示', {
@@ -312,11 +318,13 @@ export default {
             })
         },
         toSubmit() {
+            if (!this.couldSubmit) {   //判断信息是否输入完整
+                return
+            }
+            if (!this.checkInfoCorrect()) {
+                return 
+            }
             this.createOrder();
-            // if (!this.couldSubmit) {   //判断信息是否输入完整
-            //     return
-            // }
-            // this.checkInfoCorrect();
 
         }
       
@@ -334,7 +342,13 @@ export default {
         })
         .then((res) => {
             if (res.data.errcode === 0) {
-                this.wallet = res.data.rows
+                this.wallet = res.data.rows;
+                if (this.wallet < this.totalMoney) {
+                    this.balanceChoose = false;
+                    this.bankChoose = true;                    
+                }
+            } else {
+                this.$message.error(res.data.msg)
             }
         })
         .catch((err) => {

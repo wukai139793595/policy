@@ -8,13 +8,30 @@
         </div> 
         <div class="search-wrap">
             <img src="../assets/icon/search-icon.png" alt="">
-            <input class="input" type="text" placeholder="搜索">
+            <input class="input" type="text" placeholder="搜索" @input='toSearchPerson($event)'>
         </div>
-        <div class="person-wrap">
+        <div class="person-wrap" v-if="isSearch">
+            <div class="person-list" v-for="(item,index) in searchArr" :key="index">
+                <div class="img-wrap">
+                    <div class="img-box" @click="selectPerson($event, index)">
+                        <img src="../assets/icon/choose-square.png" alt="" v-if="hasSelect(item.idcard)">
+                        <img src="../assets/icon/square.png" alt="" v-else>
+                    </div>
+                    <div class="name-wrap">
+                        <div>{{item.name}}</div>
+                        <div>身份证：{{item.idcard | identifiHide}}</div>
+                    </div>
+                </div>
+                <div class="money-wrap">
+                    需交：<span>{{oneCost | divisionHundred}}元</span>
+                </div>
+            </div>
+        </div>
+        <div class="person-wrap" v-if="!isSearch">
             <div class="person-list" v-for="(item,index) in noPolicyPerson" :key="index">
                 <div class="img-wrap">
                     <div class="img-box" @click="selectPerson($event, index)">
-                        <img src="../assets/icon/choose-square.png" alt="" v-if="tempSelect.indexOf(index) > -1">
+                        <img src="../assets/icon/choose-square.png" alt="" v-if="hasSelect(item.idcard)">
                         <img src="../assets/icon/square.png" alt="" v-else>
                     </div>
                     <div class="name-wrap">
@@ -29,7 +46,7 @@
         </div>
         <div class="submit-wrap">
             <div class="select-all" @click="selectAll($event)">
-                <img src="../assets/icon/choose-square.png" alt="" v-if="isSelectAll">
+                <img src="../assets/icon/choose-square.png" alt="" v-if="selectArr.length === noPolicyPerson.length">
                 <img src="../assets/icon/square.png" alt="" v-else>
                 <span>全选</span>
             </div>
@@ -48,10 +65,10 @@ import {postNoPolicyPerson} from '@/api/api.js'
 export default {
     data () {
         return {
-            tempSelect: [],
+            isSearch: false,
+            searchArr: [],
             oneCost: 0,           //没份保险金额，需除以100
             noPolicyPerson: [{    //未保险人员集合
-
                     "group_id": 20058,
                     "name": "阿萨德",
                     "tel": "13666698009",
@@ -80,8 +97,8 @@ export default {
                 group_id: '20058'  //注：正式应改成参数
             })
             .then((res) => {
-                if (res.data.errcode === 0) {
-                   
+                console.log(res)
+                if (res.data.errcode === 0) {                   
                     this.noPolicyPerson = res.data.list
                 }else {
                     this.$message.error(res.data.msg)
@@ -97,24 +114,23 @@ export default {
 
         },
         selectPerson (event, index) {  //选择单个人操作
-            let person = this.noPolicyPerson[index];
+            let person = this.isSearch ? this.searchArr[index] :this.noPolicyPerson[index];
             let flag = false;   //是否已经选中
             let i = -1;
-
-            if (this.tempSelect.indexOf(index) > -1) {
-                i = this.tempSelect.indexOf(index);
-                this.selectArr.splice(i, 1);
-                this.tempSelect.splice(i,1);
-                this.isSelectAll = false;  
-                this.$store.commit('changeUser', this.selectArr);             
-            } else {
-                this.selectArr.push(person);
-                this.tempSelect.push(index);
-                this.$store.commit('changeUser', this.selectArr); 
-                if (this.selectArr.length === this.noPolicyPerson.length) {
-                    this.isSelectAll = true;
-                }               
+            for (let j = 0 ; j < this.selectArr.length ; j ++) {
+                if (person.idcard === this.selectArr[j].idcard) {
+                    i = j;
+                    flag = true;
+                    break;
+                }   
             }
+            if (flag) {
+                this.selectArr.splice(i, 1);
+                this.isSelectAll = false;
+            }else {
+                this.selectArr.push(person);
+            }
+            this.$store.commit('changeUser', this.selectArr);
         },
         selectAll (event) {   //选择全部操作
             if (!this.isSelectAll) {
@@ -137,6 +153,7 @@ export default {
                 this.$message('您还未选择要保险的名单');
                 return
             }
+            this.$store.commit('changeMoney', this.totalMoney);
             this.$router.push({
                 path: '/writeInfo',
                 query: {
@@ -146,15 +163,35 @@ export default {
                 }
             })
         },
+        // 搜索成员
+        toSearchPerson (event) {
+            this.searchArr = [];
+            if (event.target.value) {
+                this.noPolicyPerson.forEach((ele,ind) => {
+                    if (ele.name.indexOf(event.target.value) > -1) {
+                        this.searchArr.push(ele);
+                        this.isSearch = true;
+                    }
+                })  
+            } else {
+                this.isSearch = false;
+            }
+        },
         turnBack (event) {
             this.$store.commit('changeUser',[]);
             this.$router.go(-1);
+        },
+        hasSelect (value) {
+            var len = this.selectArr.length;
+            for (let i = 0 ; i < len ; i ++) {
+                if (this.selectArr[i].idcard === value) {
+                    return true
+                }
+            }
+            return false
         }
     },
     created () {
-        
-        this.$store.commit('changeUser',[])
-        console.log("selectPerson:selectArr",this.selectArr);
         this.initData();
     },
     filters: {
@@ -172,15 +209,6 @@ export default {
             return temp;
         }
         
-        // ,hasSelect (value) {
-        //     var len = this.selectArr.length;
-        //     for (let i = len ; i < len ; i ++) {
-        //         if (this.selectArr[i].idcard === value) {
-        //             return true
-        //         }
-        //     }
-        //     return false
-        // }
     }
 }
 </script>
