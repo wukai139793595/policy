@@ -37,20 +37,22 @@ export default {
             total: 0,  //总数量
             totalPage: 1, //总页数
             isClock: false, //网络请求锁 
-            groupArr:[{
-                "event_group_id":"20058", //小组id
-                "groupname":"I",  //小组名
-                "ROW_NUMBER":"1",
-                "apply":3,  //报名人数
-                "policy":1  //已保险人数
-                },
-                {
-                "event_group_id":"20059",
-                "groupname":"甲组",
-                "ROW_NUMBER":"2",
-                "apply":0,
-                "policy":0
-           }]
+            groupArr:[
+        //         {
+        //         "event_group_id":"20058", //小组id
+        //         "groupname":"I",  //小组名
+        //         "ROW_NUMBER":"1",
+        //         "apply":3,  //报名人数
+        //         "policy":1  //已保险人数
+        //         },
+        //         {
+        //         "event_group_id":"20059",
+        //         "groupname":"甲组",
+        //         "ROW_NUMBER":"2",
+        //         "apply":0,
+        //         "policy":0
+        //    }
+           ]
         }
     },
     methods: {

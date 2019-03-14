@@ -89,8 +89,8 @@
                             <div class="hint">可用额度<span>{{wallet}}元</span></div>
                         </div>
                     </div>
-                    <div class="balance-right" @click="changePayWay($event)">
-                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="balanceChoose">
+                    <div class="balance-right" @click="changePayWay($event,'balanceChoose')">
+                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="chooseWay === 'balanceChoose'">
                         <img src="../assets/icon/circle.png" alt="" class="icon-common" v-else>
                     </div>
                 </div>
@@ -98,12 +98,25 @@
                     <div class="bank-left">
                         <img class="pay-icon" src="../assets/icon/bank.png" alt="">
                         <div class="name-wrap">
-                            <div class="name">建设银行</div>
+                            <div class="name">建行支付宝</div>
                             <!-- <div class="bank-number">储蓄卡<span>(3365)</span></div> -->
                         </div>
                     </div>
-                    <div class="bank-right" @click="changePayWay($event)">
-                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="bankChoose">
+                    <div class="bank-right" @click="changePayWay($event, 'aliChoose')">
+                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="chooseWay === 'aliChoose'">
+                        <img src="../assets/icon/circle.png" alt="" class="icon-common" v-else>                        
+                    </div>
+                </div>
+                <div class="bank-wrap">
+                    <div class="bank-left">
+                        <img class="pay-icon" src="../assets/icon/bank.png" alt="">
+                        <div class="name-wrap">
+                            <div class="name">建行微信</div>
+                            <!-- <div class="bank-number">储蓄卡<span>(3365)</span></div> -->
+                        </div>
+                    </div>
+                    <div class="bank-right" @click="changePayWay($event, 'wxChoose')">
+                        <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="chooseWay === 'wxChoose'">
                         <img src="../assets/icon/circle.png" alt="" class="icon-common" v-else>                        
                     </div>
                 </div>
@@ -122,8 +135,7 @@ export default {
         return {
             wallet: 0,
             sex: '0',
-            balanceChoose: true,
-            bankChoose: false,
+            chooseWay: 'balanceChoose',
             name: '',
             selectCertificate: '',  //用户选择的证件类型
             certificateValue: '',    //证件号码
@@ -207,18 +219,8 @@ export default {
             // console.log(this.couldSubmit);
             this.checkSubmit();
         },
-        changePayWay (event) {   //改变支付渠道
-            if (this.balanceChoose) {
-                this.balanceChoose = false;
-                this.bankChoose = true;
-            } else {
-                if (this.wallet < this.totalMoney) {
-                    this.$message('钱包余额不足');
-                    return 
-                }
-                this.balanceChoose = true;
-                this.bankChoose = false;               
-            }
+        changePayWay (event, payWay) {   //改变支付渠道
+            this.chooseWay = payWay;
         },
         turnBack (event) {
             this.$router.go(-1);
@@ -277,28 +279,33 @@ export default {
             .then((res) => {
                 console.log('createPay',res)
                 if (res.data.errcode === 0) {
-                    if (this.balanceChoose) {
+                    if (this.chooseWay === 'balanceChoose') {
                         return postPay({
                             order_id: res.data.order_id,
-                            ssid: 'e9hbliskas76gss1oh24l2hui4'
                         })
-                    } else {
+                    } else if (this.chooseWay === 'aliChoose'){
                         return postCcbPay({
                             order_id: res.data.order_id,
-                            ssid: 'e9hbliskas76gss1oh24l2hui4'                           
+                            type: 16,
+                            paytype: 'ali'                        
                         })
-                    }
+                    } else if (this.chooseWay === 'wxChoose') {
+                        return postCcbPay({
+                            order_id: res.data.order_id,
+                            type: 16,
+                            paytype: 'wx'                        
+                        })                        
+                    } 
                 } else {
                     this.$message.error(res.data.msg);
                 }
             },(err) => {
                 this.$message.erro('网络错误')
             })
-            //支付网络请求返回
+            // 余额支付成功和建行二维码url返回
             .then((res) => {
-                console.log('payres',res)
-                if (res.data.errcode === 0) {
-                    if (this.balanceChoose) {
+                if (res.data.errcode === 0 || res.data.error === 0) {
+                    if (this.chooseWay === 'balanceChoose') {
                         this.$store.commit('changeUser',[]);  //支付成功后清除数据
                         this.$alert('余额支付成功', '提示', {
                             confirmButtonText: '确定',
@@ -308,28 +315,31 @@ export default {
                                 })
                             }
                         }); 
-                    }else if (this.bankChoose){
+                    } else if (this.chooseWay === 'aliChoose' || this.chooseWay === 'wxChoose') {
 
-                    }
-                   
+                    }   
                 } else {
-                    this.$message.error('支付失败')
+                    this.$message.error(res.data.msg)
                 }
+            },(err) => {
+                this.$message.error('网络错误')
             })
+
         },
         toSubmit() {
-            if (!this.couldSubmit) {   //判断信息是否输入完整
-                return
-            }
-            if (!this.checkInfoCorrect()) {
-                return 
-            }
+            // if (!this.couldSubmit) {   //判断信息是否输入完整
+            //     return
+            // }
+            // if (!this.checkInfoCorrect()) {    //判断信息格式
+            //     return 
+            // }
             this.createOrder();
 
         }
       
     },
-    computed: {
+    computed: {  
+        //vue中的客户信息
         selectArr () {
             return this.$store.state.selectArr
         }
@@ -337,15 +347,13 @@ export default {
     created () {
         postWallet({
             org_id: 32,
-            ssid: 'e9hbliskas76gss1oh24l2hui4',
             entrance: 1
         })
         .then((res) => {
             if (res.data.errcode === 0) {
                 this.wallet = res.data.rows;
                 if (this.wallet < this.totalMoney) {
-                    this.balanceChoose = false;
-                    this.bankChoose = true;                    
+                    this.chooseWay = 'aliChoose';                 
                 }
             } else {
                 this.$message.error(res.data.msg)
@@ -482,7 +490,7 @@ export default {
                 width: 100%;
             }
             .balance-wrap{
-                margin-bottom: 30px;
+                // margin-bottom: 30px;
                 .balance-left{
                     display: flex;
                     align-items: center;
@@ -510,6 +518,7 @@ export default {
                 }
             }
             .bank-wrap{
+                padding: 8px 0;
                 .bank-left{
                     display: flex;
                     align-items: center;   
