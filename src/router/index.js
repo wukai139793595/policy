@@ -31,6 +31,6 @@ export default new Router({
       path: '/writeInfo',
       name: 'writeInfo',
       component: writeInfo
-    },
+    }
   ]
 })

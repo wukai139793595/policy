@@ -60,7 +60,7 @@ export default {
         initData () {
             this.isClock = true;
             postGroup({
-                event_id: '1620',   //需替换成参数
+                event_id: this.eventId,   //需替换成参数
                 page: this.page,
                 limit: this.limit
             })
@@ -99,6 +99,7 @@ export default {
             }
         },
         toBuyPolicy (event, index) {
+           
             var groupId = this.groupArr[index].event_group_id;
             this.$router.push({
                 path: '/policyClassify',
@@ -112,6 +113,7 @@ export default {
         Scroll
     },
     created () {
+        this.eventId = window.name || '1620';
         this.initData();
     }
 }

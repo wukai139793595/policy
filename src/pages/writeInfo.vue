@@ -35,7 +35,7 @@
             <div class="info-content">               
                 <div class="name-wrap">
                     <span class="name">姓名</span>
-                    <input type="text" placeholder="输入投保人姓名" @change="infoChange" v-model="name" >
+                    <input type="text" placeholder="输入投保人姓名" @input="infoChange" v-model="name" >
                 </div>
                 <div class="identify-wrap">
                     <span class="name">证件类型</span>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="name-wrap">
                     <span class="name">证件号</span>
-                    <input type="text" placeholder="输入投保人身份证" @change="infoChange" v-model="certificateValue">
+                    <input type="text" placeholder="输入投保人身份证" @input="infoChange" v-model="certificateValue">
                 </div>
                 <div class="sex-wrap">
                     <span class="name">性别</span>
@@ -59,13 +59,13 @@
                 </div>
                 <div class="phone-wrap">
                     <span class="name">电话</span>
-                    <input type="text" placeholder="输入投保人电话" @change="infoChange" v-model="phone">
+                    <input type="text" placeholder="输入投保人电话" @input="infoChange" v-model="phone">
                 </div>
                 <div class="email-wrap">
                     <span class="name">邮箱</span>
-                    <input type="text" placeholder="输入投保人邮箱" @change="infoChange" v-model="email"> 
+                    <input type="text" placeholder="输入投保人邮箱" @input="infoChange" v-model="email"> 
                 </div>
-                <div class="relative-wrap">
+                <!-- <div class="relative-wrap">
                     <span class="name">关系</span>
                     <el-select class="el-se-relative" v-model="selectRelative" placeholder="请选择与被保人关系" @change="infoChange">
                         <el-option
@@ -75,7 +75,7 @@
                         :value="item.num">
                         </el-option>
                     </el-select>                    
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="pay-way">
@@ -125,21 +125,33 @@
         <div class="submit" :class="{could: couldSubmit}" @click="toSubmit($event)">
             立即支付
         </div>
+        <div class="qr-code-wrap" v-if="readyPay">
+            <qrCode 
+                :qr_code='qr_code'
+                :amount= 'amount'
+                :chooseWay = 'chooseWay'
+            />
+        </div>
     </div>
 </template>
 <script>
-import {postWallet, postCreateOrder, postPay, postCcbPay} from '@/api/api.js'
-import {checkName,checkPhone,checkEmail,checkIdcard} from '@/util/index.js'
+import {postWallet, postCreateOrder, postPay,postCcbPay } from '@/api/api.js'
+import {checkName,checkPhone,checkEmail,checkIdcard,API_URL} from '@/util/index.js'
+import qrCode from '@/components/qrCode.vue'
 export default {
     data () {
         return {
+            readyPay: false,
+            orderId: '',
+            qr_code: '',
+            amount: 0,
             wallet: 0,
             sex: '0',
             chooseWay: 'balanceChoose',
             name: '',
             selectCertificate: '',  //用户选择的证件类型
             certificateValue: '',    //证件号码
-            selectRelative: '',    //用户选择的关系
+            selectRelative: 9,    //用户选择的关系
             phone: '',
             email: '',
             startTime: '',
@@ -208,7 +220,7 @@ export default {
     },
     methods: {
         checkSubmit () {  //判断用户信息是否填完整
-            if (this.startTime && this.endTime && this.name && this.selectCertificate && this.certificateValue && this.selectRelative && this.phone && this.email) {
+            if (this.startTime && this.endTime && this.name && this.selectCertificate && this.certificateValue && this.phone && this.email) {
                 this.couldSubmit = true;
             } else {
                 this.couldSubmit = false;
@@ -256,9 +268,9 @@ export default {
                 }
             })
             var data = {
-                ssid: 'e9hbliskas76gss1oh24l2hui4',
+                // ssid: 'e9hbliskas76gss1oh24l2hui4',
                 org_id: 1,
-                entrance: 1,
+                // entrance: 1,  //该参数已删除
                 event_group_id: this.$route.query.groupId,
                 id: this.$route.query.policyId,
                 begin_time: this.startTime,
@@ -279,19 +291,20 @@ export default {
             .then((res) => {
                 console.log('createPay',res)
                 if (res.data.errcode === 0) {
+                    this.orderId = res.data.order_id;
                     if (this.chooseWay === 'balanceChoose') {
                         return postPay({
                             order_id: res.data.order_id,
                         })
                     } else if (this.chooseWay === 'aliChoose'){
                         return postCcbPay({
-                            order_id: res.data.order_id,
+                            orderid: res.data.order_id,
                             type: 16,
                             paytype: 'ali'                        
                         })
                     } else if (this.chooseWay === 'wxChoose') {
                         return postCcbPay({
-                            order_id: res.data.order_id,
+                            orderid: res.data.order_id,
                             type: 16,
                             paytype: 'wx'                        
                         })                        
@@ -316,23 +329,27 @@ export default {
                             }
                         }); 
                     } else if (this.chooseWay === 'aliChoose' || this.chooseWay === 'wxChoose') {
-
+                        console.log(this.chooseWay,res)
+                        this.qr_code = res.data.datArr.qr_code;
+                        this.amount = res.data.datArr.amount;
+                        this.readyPay = true;
                     }   
                 } else {
                     this.$message.error(res.data.msg)
                 }
             },(err) => {
+                console.log(5555)
                 this.$message.error('网络错误')
             })
 
         },
         toSubmit() {
-            // if (!this.couldSubmit) {   //判断信息是否输入完整
-            //     return
-            // }
-            // if (!this.checkInfoCorrect()) {    //判断信息格式
-            //     return 
-            // }
+            if (!this.couldSubmit) {   //判断信息是否输入完整
+                return
+            }
+            if (!this.checkInfoCorrect()) {    //判断信息格式
+                return 
+            }
             this.createOrder();
 
         }
@@ -362,11 +379,16 @@ export default {
         .catch((err) => {
             this.$message.err('网络错误')
         })
+    },
+    components: {
+        qrCode
     }
 }
 </script>
 <style lang="less">
 .write-info{
+    width: 100%;
+    height: 100%;
     p{
         font-size: 26px;/*px*/
         color: #666;
@@ -557,6 +579,14 @@ export default {
     .could{
         color: #fff;
         background-color: #3399ff;
+    }
+    .qr-code-wrap{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background-color: #fff;
     }
 }
 </style>

@@ -1,3 +1,4 @@
+import axios from 'axios'
 export function checkName (value) {
     let newStr = String(value);
     return /^[\u4E00-\u9FA5\uf900-\ufa2d·s]{2,20}$/.test(newStr);

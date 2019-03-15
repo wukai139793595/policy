@@ -8,42 +8,27 @@
         </div> 
         <div class="search-wrap">
             <img src="../assets/icon/search-icon.png" alt="">
-            <input class="input" type="text" placeholder="搜索" @input='toSearchPerson($event)'>
+            <input class="input" type="text" placeholder="搜索" v-model="inputValue" @keyup.enter='toSearchPerson($event)'>
         </div>
-        <div class="person-wrap" v-if="isSearch">
-            <div class="person-list" v-for="(item,index) in searchArr" :key="index">
-                <div class="img-wrap">
-                    <div class="img-box" @click="selectPerson($event, index)">
-                        <img src="../assets/icon/choose-square.png" alt="" v-if="hasSelect(item.idcard)">
-                        <img src="../assets/icon/square.png" alt="" v-else>
+        <scroll @refresh="refresh" @loadmore="loadmore">
+            <div class="person-wrap" >
+                <div class="person-list" v-for="(item,index) in noPolicyPerson" :key="index">
+                    <div class="img-wrap">
+                        <div class="img-box" @click="selectPerson($event, index)">
+                            <img src="../assets/icon/choose-square.png" alt="" v-if="hasSelect(item.idcard)">
+                            <img src="../assets/icon/square.png" alt="" v-else>
+                        </div>
+                        <div class="name-wrap">
+                            <div>{{item.name}}</div>
+                            <div>身份证：{{item.idcard | identifiHide}}</div>
+                        </div>
                     </div>
-                    <div class="name-wrap">
-                        <div>{{item.name}}</div>
-                        <div>身份证：{{item.idcard | identifiHide}}</div>
+                    <div class="money-wrap">
+                        需交：<span>{{oneCost | divisionHundred}}元</span>
                     </div>
-                </div>
-                <div class="money-wrap">
-                    需交：<span>{{oneCost | divisionHundred}}元</span>
                 </div>
             </div>
-        </div>
-        <div class="person-wrap" v-if="!isSearch">
-            <div class="person-list" v-for="(item,index) in noPolicyPerson" :key="index">
-                <div class="img-wrap">
-                    <div class="img-box" @click="selectPerson($event, index)">
-                        <img src="../assets/icon/choose-square.png" alt="" v-if="hasSelect(item.idcard)">
-                        <img src="../assets/icon/square.png" alt="" v-else>
-                    </div>
-                    <div class="name-wrap">
-                        <div>{{item.name}}</div>
-                        <div>身份证：{{item.idcard | identifiHide}}</div>
-                    </div>
-                </div>
-                <div class="money-wrap">
-                    需交：<span>{{oneCost | divisionHundred}}元</span>
-                </div>
-            </div>
-        </div>
+        </scroll>
         <div class="submit-wrap">
             <div class="select-all" @click="selectAll($event)">
                 <img src="../assets/icon/choose-square.png" alt="" v-if="selectArr.length === noPolicyPerson.length">
@@ -62,12 +47,16 @@
 </template>
 <script>
 import {postNoPolicyPerson} from '@/api/api.js'
+import Scroll from '@/components/scroll.vue'
 export default {
     data () {
         return {
-            isSearch: false,
+            inputValue: '',
+            isClock: false,
+            page: 1,
+            total: 0,
             searchArr: [],
-            oneCost: 0,           //没份保险金额，需除以100
+            oneCost: 0,           //每份保险金额，需除以100
             noPolicyPerson: [
                 // {    //未保险人员集合
                 //     "group_id": 20058,
@@ -87,21 +76,47 @@ export default {
             isSelectAll: false      //是否全选
         }
     },
+    components: {
+        Scroll
+    },
     computed: {
         selectArr() {    //客户选择要保险的人员
             return this.$store.state.selectArr
         }
     },
     methods: {
+        // 下拉刷新
+        refresh () {
+            this.page = 1;
+            this.noPolicyPerson = [];
+            this.getInfo();
+        },
+        //上拉加载
+        loadmore (func) {
+            if(this.noPolicyPerson.length >= this.total) {
+                func(true);
+            }else{
+                if (!this.isClock) {
+                    this.page += 1;
+                    this.getInfo();
+                }
+                func();
+            }
+        },        
         // 获取赛事小组未保险人员
         getInfo () {
             postNoPolicyPerson({
-                group_id: '20058'  //注：正式应改成参数
+                // group_id: this.groupId,
+                group_id: '20058',  //注：正式应改成参数
+                name: this.inputValue,
+                page: this.page,
+                limit: 20
             })
             .then((res) => {
                 console.log(res)
                 if (res.data.errcode === 0) {                   
-                    this.noPolicyPerson = res.data.list
+                    this.noPolicyPerson.push(...res.data.list);
+                    this.total = res.data.total;
                 }else {
                     this.$message.error(res.data.msg)
                 }
@@ -113,7 +128,7 @@ export default {
         initData() {
             this.getInfo();
             this.oneCost = this.$route.query.oneCost;
-
+            this.groupId = this.$route.query.group_id;
         },
         selectPerson (event, index) {  //选择单个人操作
             let person = this.isSearch ? this.searchArr[index] :this.noPolicyPerson[index];
@@ -150,6 +165,7 @@ export default {
                 this.isSelectAll = false;
             }
         },
+        // 跳转到购买页
         toWriteInfo (event) {
             if (!this.selectArr.length) {
                 this.$message('您还未选择要保险的名单');
@@ -167,17 +183,10 @@ export default {
         },
         // 搜索成员
         toSearchPerson (event) {
-            this.searchArr = [];
-            if (event.target.value) {
-                this.noPolicyPerson.forEach((ele,ind) => {
-                    if (ele.name.indexOf(event.target.value) > -1) {
-                        this.searchArr.push(ele);
-                        this.isSearch = true;
-                    }
-                })  
-            } else {
-                this.isSearch = false;
-            }
+            this.noPolicyPerson = [];       
+            this.page = 1;
+            console.log(this.inputValue)
+            this.getInfo();   
         },
         turnBack (event) {
             this.$store.commit('changeUser',[]);

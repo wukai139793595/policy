@@ -163,7 +163,7 @@ export default {
             this.$router.push({
                 path: '/selectPerson',
                 query: {
-                    oneCost: this.policyArr[this.selected_index].premium,
+                    oneCost: this.policyArr[this.selectedIndex].premium,
                     groupId: this.$route.query.groupId,
                     policyId: this.policy_id
                 }
