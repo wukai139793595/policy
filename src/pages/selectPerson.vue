@@ -1,11 +1,12 @@
 <template>
     <div class="select-person">
-        <div class="head">
+        <!-- <div class="head">
             <div class="turn-back">
                 <img src="../assets/icon/left-direction.png" alt="" @click="turnBack($event)">
             </div>
             <div class="title">请选择被保险的名单</div>
-        </div> 
+        </div>  -->
+        <ls-head  :headName='headName'/>
         <div class="search-wrap">
             <img src="../assets/icon/search-icon.png" alt="">
             <input class="input" type="text" placeholder="搜索" v-model="inputValue" @keyup.enter='toSearchPerson($event)'>
@@ -48,9 +49,12 @@
 <script>
 import {postNoPolicyPerson} from '@/api/api.js'
 import Scroll from '@/components/scroll.vue'
+import lsHead from '@/components/lsHead.vue'
+
 export default {
     data () {
         return {
+            headName: '请选择被保险的名单',
             inputValue: '',
             isClock: false,
             page: 1,
@@ -58,26 +62,27 @@ export default {
             searchArr: [],
             oneCost: 0,           //每份保险金额，需除以100
             noPolicyPerson: [
-                // {    //未保险人员集合
-                //     "group_id": 20058,
-                //     "name": "阿萨德",
-                //     "tel": "13666698009",
-                //     "idcard": "asd4342323",
-                //     "row_number": "1"
-                // },
-                // {
-                //     "group_id": 20058,
-                //     "name": "叶晓飞",
-                //     "tel": "13478670738",
-                //     "idcard": "332521197703260239",
-                //     "row_number": "2"
-                // }
+                {    //未保险人员集合
+                    "group_id": 20058,
+                    "name": "阿萨德",
+                    "tel": "13666698009",
+                    "idcard": "asd4342323",
+                    "row_number": "1"
+                },
+                {
+                    "group_id": 20058,
+                    "name": "叶晓飞",
+                    "tel": "13478670738",
+                    "idcard": "332521197703260239",
+                    "row_number": "2"
+                }
             ],
             isSelectAll: false      //是否全选
         }
     },
     components: {
-        Scroll
+        Scroll,
+        lsHead
     },
     computed: {
         selectArr() {    //客户选择要保险的人员
@@ -234,6 +239,7 @@ export default {
         line-height: 60px;
         background-color: #f6f6f6;
         margin: 40px auto 30px auto;
+        border-radius: 30px;
         img{
             width: 30px;
             height: 30px;
@@ -262,7 +268,9 @@ export default {
             width: 100%;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 50px;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
             .img-wrap{
                 display: flex;
                 .img-box{
@@ -273,7 +281,7 @@ export default {
                         width:30px;
                         height: 30px;
                         position: relative;
-                        top: 4px;
+                        top: 8px;
                     }
                 }
                 .name-wrap{
@@ -314,8 +322,11 @@ export default {
         background-color: #fff;
         .select-all{
             img{
-                width: 30px;
-                height: 30px;
+                width: 34px;
+                height: 34px;
+                position: relative;
+                top: 4px;
+                margin-right: 10px;
             }
             span{
                 font-size: 32px;/*px*/

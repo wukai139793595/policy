@@ -1,11 +1,12 @@
 <template>
     <div class="write-info">
-        <div class="head">
+        <!-- <div class="head">
             <div class="turn-back">
                 <img src="../assets/icon/left-direction.png" alt="" @click="turnBack($event)">
             </div>
             <div class="title">填写信息</div>
-        </div>
+        </div> -->
+        <ls-head :headName='headName'/>
         <div class="set-time">
             <p>请设置保险起止时间</p>
             <div class="time-wrap">
@@ -82,7 +83,7 @@
         <div class="pay-way">
             <p>请选择支付方式</p>
             <div class="way-wrap">
-                <div class="balance-wrap">
+                <!-- <div class="balance-wrap">
                     <div class="balance-left">
                         <img class="pay-icon" src="../assets/icon/money@2x.png" alt="">
                         <div class="balance-hint">
@@ -94,7 +95,7 @@
                         <img src="../assets/icon/choose-circle.png" alt="" class="icon-common" v-if="chooseWay === 'balanceChoose'">
                         <img src="../assets/icon/circle.png" alt="" class="icon-common" v-else>
                     </div>
-                </div>
+                </div> -->
                 <div class="bank-wrap">
                     <div class="bank-left">
                         <img class="pay-icon" src="../assets/icon/bank.png" alt="">
@@ -141,9 +142,11 @@
 import {postWallet, postCreateOrder, postPay,postCcbPay } from '@/api/api.js'
 import {checkName,checkPhone,checkEmail,checkIdcard,API_URL} from '@/util/index.js'
 import qrCode from '@/components/qrCode.vue'
+import lsHead from '@/components/lsHead.vue'
 export default {
     data () {
         return {
+            headName: '填写信息',
             readyPay: false,
             orderId: '',
             qr_code: '',
@@ -386,7 +389,8 @@ export default {
         })
     },
     components: {
-        qrCode
+        qrCode,
+        lsHead
     }
 }
 </script>
@@ -404,36 +408,36 @@ export default {
         line-height:60px;
         border: none;
         margin-left: 20px;
-        background-color: #f6f6f6;
+        // background-color: #f6f6f6;
         outline: none;
     }
     input::placeholder{
         color: #9999;
     }
-    .head{
-        width: 702px;
-        height: 30px;
-        margin: 0 auto;
-        padding-top: 20px;
-        text-align: center;
-        position: relative;
-        line-height: 30px;
-        .turn-back{
-            position: absolute;
-            left: 0px;
-            top: 20px;
-            width: 30px;
-            height: 30px;
-            img{
-                width: 100%;
-                height: 100%;
-            }
-        }
-        .title{
-            display: inline-block;
-            font-size: 30px;/*px*/
-        }
-    }
+    // .head{
+    //     width: 702px;
+    //     height: 30px;
+    //     margin: 0 auto;
+    //     padding-top: 20px;
+    //     text-align: center;
+    //     position: relative;
+    //     line-height: 30px;
+    //     .turn-back{
+    //         position: absolute;
+    //         left: 0px;
+    //         top: 20px;
+    //         width: 30px;
+    //         height: 30px;
+    //         img{
+    //             width: 100%;
+    //             height: 100%;
+    //         }
+    //     }
+    //     .title{
+    //         display: inline-block;
+    //         font-size: 30px;/*px*/
+    //     }
+    // }
     .set-time{
         width: 702px;       
         margin: 50px auto 0 auto;
@@ -453,6 +457,7 @@ export default {
                 .el-input__inner{
                     text-align: center;
                     font-size: 28px;/*px*/
+                    background-color: #eee;
                 }
                 .el-input__inner::placeholder{
                     text-align: center;
@@ -480,9 +485,10 @@ export default {
         .info-content{
             width: 100%;
             box-sizing: border-box;
-            padding-left: 40px;
-            margin-top: 40px;
-            background-color: #f4f4f4;
+            padding: 10px 20px 10px 40px;
+            margin-top: 20px;
+            box-shadow: 0 0 16px #eee;
+            // background-color: #f4f4f4;
             &>div{
                 margin-bottom: 20px;
                 margin-top: 20px;
@@ -506,6 +512,8 @@ export default {
         .way-wrap{
             width: 662px;
             margin: 30px auto;
+            padding: 10px 20px 10px 20px;
+            box-shadow: 0 0 16px #eee;
             .pay-icon{
                 width: 40px;
                 height:40px;

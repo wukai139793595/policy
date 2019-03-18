@@ -1,11 +1,12 @@
 <template>
     <div class="policy">
-        <div class="head">
+        <!-- <div class="head">
             <div class="turn-back">
                 <img src="../assets/icon/left-direction.png" alt="">
             </div>
             <div class="title">购买保险</div>
-        </div>
+        </div> -->
+        <ls-head :headName="headName"/>
         <scroll @refresh="refresh" @loadmore="loadmore">
             <div class="group-wrap">
                 <div class="group-list" v-for="(item,index) in groupArr" :key="index">
@@ -27,31 +28,33 @@
     </div>
 </template>
 <script>
+import lsHead from '@/components/lsHead.vue'
 import Scroll from '@/components/scroll.vue'
 import {postGroup} from '@/api/api.js'
 export default {
     data () {
         return {
+            headName: '购买保险',
             page: 1, //当前加载到第几页
             limit: 12,
             total: 0,  //总数量
             totalPage: 1, //总页数
             isClock: false, //网络请求锁 
             groupArr:[
-        //         {
-        //         "event_group_id":"20058", //小组id
-        //         "groupname":"I",  //小组名
-        //         "ROW_NUMBER":"1",
-        //         "apply":3,  //报名人数
-        //         "policy":1  //已保险人数
-        //         },
-        //         {
-        //         "event_group_id":"20059",
-        //         "groupname":"甲组",
-        //         "ROW_NUMBER":"2",
-        //         "apply":0,
-        //         "policy":0
-        //    }
+                {
+                "event_group_id":"20058", //小组id
+                "groupname":"I",  //小组名
+                "ROW_NUMBER":"1",
+                "apply":3,  //报名人数
+                "policy":1  //已保险人数
+                },
+                {
+                "event_group_id":"20059",
+                "groupname":"甲组",
+                "ROW_NUMBER":"2",
+                "apply":0,
+                "policy":0
+           }
            ]
         }
     },
@@ -110,7 +113,8 @@ export default {
         }
     },
     components: {
-        Scroll
+        Scroll,
+        lsHead
     },
     created () {
         this.eventId = '1620' || window.parant.name ;
@@ -122,30 +126,30 @@ export default {
 .policy{
     width: 100%;
     height: 100%;
-    .head{
-        width: 702px;
-        height: 30px;
-        margin: 0 auto;
-        padding-top: 20px;
-        text-align: center;
-        position: relative;
-        line-height: 30px;
-        .turn-back{
-            position: absolute;
-            left: 0px;
-            top: 20px;
-            width: 30px;
-            height: 30px;
-            img{
-                width: 100%;
-                height: 100%;
-            }
-        }
-        .title{
-            display: inline-block;
-            font-size: 34px;/*px*/
-        }
-    }
+    // .head{
+    //     width: 702px;
+    //     height: 30px;
+    //     margin: 0 auto;
+    //     padding-top: 20px;
+    //     text-align: center;
+    //     position: relative;
+    //     line-height: 30px;
+    //     .turn-back{
+    //         position: absolute;
+    //         left: 0px;
+    //         top: 20px;
+    //         width: 30px;
+    //         height: 30px;
+    //         img{
+    //             width: 100%;
+    //             height: 100%;
+    //         }
+    //     }
+    //     .title{
+    //         display: inline-block;
+    //         font-size: 34px;/*px*/
+    //     }
+    // }
     .group-wrap{
         width: 702px;
         margin: 0 auto;
@@ -156,7 +160,10 @@ export default {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
+            box-sizing: border-box;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #eee;
             .name-wrap{
                 text-align: left;
                 .group-name{

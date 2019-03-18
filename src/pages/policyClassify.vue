@@ -1,11 +1,12 @@
 <template>
     <div class="policy-classify">
-        <div class="head">
+        <!-- <div class="head">
             <div class="turn-back">
                 <img src="../assets/icon/left-direction.png" alt="" @click="turnBack($event)">
             </div>
             <div class="title">请选择保险</div>
-        </div>    
+        </div>     -->
+        <ls-head :headName="headName"/>
         <div class="classify-wrap">
             <div class="classify-list" v-for="(item,index) in policyArr" :key="index">
                 <div class="name-wrap">
@@ -29,7 +30,8 @@
                     </span>
                 </div>
             </div>
-        </div>    
+        </div>   
+        <div class="white-space"></div> 
         <div class="protocols-submit">
             <div class="protocols-wrap">
                 <div class="img-wrap" @click="changeAgree($event)">
@@ -58,58 +60,63 @@
     </div>
 </template>
 <script>
+import lsHead from '@/components/lsHead.vue'
 import {mapState, mapMutations} from 'vuex'
 import {postInsuranceClassify} from '@/api/api.js'
 export default {
     data () {
         return {
+            headName: '请选择保险',
             showPolicyProtocols: false,//显示保险协议
             agreePolicyProtocols: false,//是否同意保险协议
             policyArr: [ 
-                // {
-                //     "id":"1",  //险种id
-                //     "risk_code":"EAA",  //险种代码
-                //     "risk_name":"个人意外险",  //险种名字
-                //     "periodmin":"1",  //保险最小期限
-                //     "amount":"200600", //保额
-                //     "premium":"1000",  //保险费
-                //     "periodmax":"3",  //保险最大期限
-                //     "ROW_NUMBER":"1" 
-                // },
-                // {
-                //     "id":"2",
-                //     "risk_code":"EAA",
-                //     "risk_name":"个人意外险",
-                //     "periodmin":"4",
-                //     "amount":"200600",
-                //     "premium":"1500",
-                //     "periodmax":"5",
-                //     "ROW_NUMBER":"2"
-                // },
-                // {
-                //     "id":"3",
-                //     "risk_code":"EAA",
-                //     "risk_name":"个人意外险",
-                //     "periodmin":"6",
-                //     "amount":"200600",
-                //     "premium":"2000",
-                //     "periodmax":"7",
-                //     "ROW_NUMBER":"3"
-                // },
-                // {
-                //     "id":"4",
-                //     "risk_code":"EAC",
-                //     "risk_name":"团体意外险",
-                //     "periodmin":"1",
-                //     "amount":"120600",
-                //     "premium":"450",
-                //     "periodmax":"3",
-                //     "ROW_NUMBER":"4"
-                // }
+                {
+                    "id":"1",  //险种id
+                    "risk_code":"EAA",  //险种代码
+                    "risk_name":"个人意外险",  //险种名字
+                    "periodmin":"1",  //保险最小期限
+                    "amount":"200600", //保额
+                    "premium":"1000",  //保险费
+                    "periodmax":"3",  //保险最大期限
+                    "ROW_NUMBER":"1" 
+                },
+                {
+                    "id":"2",
+                    "risk_code":"EAA",
+                    "risk_name":"个人意外险",
+                    "periodmin":"4",
+                    "amount":"200600",
+                    "premium":"1500",
+                    "periodmax":"5",
+                    "ROW_NUMBER":"2"
+                },
+                {
+                    "id":"3",
+                    "risk_code":"EAA",
+                    "risk_name":"个人意外险",
+                    "periodmin":"6",
+                    "amount":"200600",
+                    "premium":"2000",
+                    "periodmax":"7",
+                    "ROW_NUMBER":"3"
+                },
+                {
+                    "id":"4",
+                    "risk_code":"EAC",
+                    "risk_name":"团体意外险",
+                    "periodmin":"1",
+                    "amount":"120600",
+                    "premium":"450",
+                    "periodmax":"3",
+                    "ROW_NUMBER":"4"
+                }
             ],
             policy_id: '',    //选择的id
             selected_index: 0  //选择的序号
         }
+    },
+    components: {
+        lsHead
     },
     computed: {
         ...mapState(['money'])
@@ -190,35 +197,37 @@ export default {
     width: 100%;
     height: 100%;
     position: relative;
-    .head{
-        width: 702px;
-        height: 30px;
-        margin: 0 auto;
-        padding-top: 20px;
-        text-align: center;
-        position: relative;
-        line-height: 30px;
-        .turn-back{
-            position: absolute;
-            left: 0px;
-            top: 20px;
-            width: 30px;
-            height: 30px;
-            img{
-                width: 100%;
-                height: 100%;
-            }
-        }
-        .title{
-            display: inline-block;
-            font-size: 34px;/*px*/
-        }
-    }   
+    // .head{
+    //     width: 702px;
+    //     height: 30px;
+    //     margin: 0 auto;
+    //     padding-top: 20px;
+    //     text-align: center;
+    //     position: relative;
+    //     line-height: 30px;
+    //     .turn-back{
+    //         position: absolute;
+    //         left: 0px;
+    //         top: 20px;
+    //         width: 30px;
+    //         height: 30px;
+    //         img{
+    //             width: 100%;
+    //             height: 100%;
+    //         }
+    //     }
+    //     .title{
+    //         display: inline-block;
+    //         font-size: 34px;/*px*/
+    //     }
+    // }   
     .classify-wrap{
         width: 702px;
         box-sizing: border-box;
-        padding: 50px 20px 180px 20px;
-        margin: 0 auto;
+        padding: 30px 20px 0px 20px;
+        margin: 10px auto 0;
+        box-shadow: 0px 0px 16px #eee;
+
         .classify-list{
             width: 100%;
             padding-bottom: 30px;
@@ -263,6 +272,10 @@ export default {
                 }
             }
         }
+    }
+    .white-space{
+        width: 100%;
+        height: 180px;
     }
     .protocols-submit{
         width: 100%;
