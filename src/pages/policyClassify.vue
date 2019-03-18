@@ -218,7 +218,7 @@ export default {
     //     }
     //     .title{
     //         display: inline-block;
-    //         font-size: 34px;/*px*/
+    //         font-size: 34px;
     //     }
     // }   
     .classify-wrap{
@@ -239,7 +239,7 @@ export default {
                 margin-bottom: 10px;
                 justify-content: space-between;
                 .name{
-                    font-size: 34px; /*px*/
+                    font-size: 30px; 
                     font-weight: 500;
                     color: #333;
                 }
@@ -256,7 +256,7 @@ export default {
                         }
                     }
                     span{
-                        font-size: 34px; /*px*/
+                        font-size: 30px; 
                         font-weight: 500;
                         color: #333;
                     }
@@ -266,7 +266,7 @@ export default {
                 width: 100%;
                 color: #999;
                 text-align: left;
-                font-size: 28px; /*px*/
+                font-size: 26px; 
                 .policy-duration{
                     margin-right: 20px;
                 }
@@ -293,7 +293,9 @@ export default {
                 width: 30px;
                 height: 30px;
                 display: inline-block;
-                vertical-align: middle;
+                position: relative;
+                top: 6px;
+                // vertical-align: middle;
                 img{
                     width: 100%;
                     height: 100%;
@@ -302,7 +304,7 @@ export default {
             .protocols{
                 display: inline-block;
                 margin-left: 30px;
-                font-size: 30px;/*px*/
+                font-size: 28px;
                 letter-spacing: 4px;
                 span{
                     display: inline-block;
@@ -321,7 +323,7 @@ export default {
             line-height: 80px;
             border-radius: 40px;
             color: #fff;
-            font-size: 34px;/*px*/
+            font-size: 30px;
             font-weight: bold;
             letter-spacing: 8px;
         }

@@ -45,7 +45,7 @@
         }
         .title{
             display: inline-block;
-            font-size: 34px;/*px*/
+            font-size: 30px;
         }
     }
 </style>

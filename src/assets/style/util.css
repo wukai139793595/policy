@@ -34,7 +34,7 @@ li{
 }
 .head .title{
     display: inline-block;
-    font-size: 30px;/*px*/
+    font-size: 30px;
 }
 .head .turn-back   img{
     width: 100%;
@@ -74,5 +74,5 @@ span.el-input__prefix{
     margin: 10px 0;
 }
 .el-scrollbar__view .el-select-dropdown__item span{
-    font-size: 30px;/*px*/
+    font-size: 30px;
 }

@@ -147,7 +147,7 @@ export default {
     //     }
     //     .title{
     //         display: inline-block;
-    //         font-size: 34px;/*px*/
+    //         font-size: 34px;
     //     }
     // }
     .group-wrap{
@@ -168,10 +168,10 @@ export default {
                 text-align: left;
                 .group-name{
                     color: #333;
-                    font-size: 34px; /*px*/
+                    font-size: 30px; 
                 }
                 .group-info{
-                    font-size: 28px; /*px*/
+                    font-size: 28px; 
                     span{
                         color: #999;
                     }
@@ -181,7 +181,7 @@ export default {
                 width: 100px;
                 height: 40px;
                 line-height: 40px;
-                font-size: 28px;/*px*/
+                font-size: 28px;
                 background-color: #3399ff;
                 color: #fff;
                 font-weight: bold;

@@ -399,7 +399,7 @@ export default {
     width: 100%;
     height: 100%;
     p{
-        font-size: 26px;/*px*/
+        font-size: 26px;
         color: #666;
     }
     input{
@@ -435,7 +435,7 @@ export default {
     //     }
     //     .title{
     //         display: inline-block;
-    //         font-size: 30px;/*px*/
+    //         font-size: 30px;
     //     }
     // }
     .set-time{
@@ -456,12 +456,12 @@ export default {
                 text-align: center;
                 .el-input__inner{
                     text-align: center;
-                    font-size: 28px;/*px*/
+                    font-size: 28px;
                     background-color: #eee;
                 }
                 .el-input__inner::placeholder{
                     text-align: center;
-                    font-size: 28px;/*px*/
+                    font-size: 28px;
                 }
             }
             .striping{
@@ -495,7 +495,7 @@ export default {
                 display: flex;
                 .name{
                     color: #333;
-                    font-size: 30px;/*px*/
+                    font-size: 30px;
                     margin-right: 40px;
                     font-weight: bold;
                 }
@@ -533,12 +533,12 @@ export default {
                         margin-left: 20px;
                         div{
                             margin-bottom: 10px;
-                            font-size: 30px; /*px*/
+                            font-size: 30px; 
                             color: #333;
                         }
                         .hint{
                             color: #666;
-                            font-size: 24px; /*px*/
+                            font-size: 24px; 
                         }
                     }
                 }
@@ -548,7 +548,7 @@ export default {
                     .to-recharge{
                         margin-right: 40px;
                         color: #3399ff;
-                        font-size: 24px; /*px*/                       
+                        font-size: 24px;                        
                     }
                 }
             }
@@ -560,12 +560,12 @@ export default {
                     .name-wrap{
                         margin-left: 20px;
                         .name{
-                            font-size: 30px; /*px*/
+                            font-size: 30px; 
                             color: #333;                            
                         }
                         .bank-number{
                             color: #666;
-                            font-size: 24px; /*px*/                            
+                            font-size: 24px;                             
                         }
                     }                 
                 }
@@ -585,7 +585,7 @@ export default {
         line-height: 80px;
         border-radius: 40px;
         color: #666;
-        font-size: 30px;/*px*/
+        font-size: 30px;
         font-weight: bold;
         letter-spacing: 8px;
     }

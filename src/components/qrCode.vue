@@ -112,13 +112,13 @@
     box-sizing: border-box;
     div{
         text-align: center;
-        font-size: 38px; /*px*/
+        font-size: 38px; 
         margin-bottom: 40px;
     }
     .canvas-wrap{
         margin: 0 auto;
-        width: 328px; /*px*/
-        height: 328px; /*px*/
+        width: 328px; 
+        height: 328px; 
     }
     .success-wrap{
       width: 100%;

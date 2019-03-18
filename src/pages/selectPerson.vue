@@ -287,19 +287,19 @@ export default {
                 .name-wrap{
                     margin-left: 20px;
                     div:nth-of-type(1) {
-                        font-size: 34px; /*px*/
+                        font-size: 30px; 
                         color: #333;
                         margin-bottom: 8px;
                     }
                     div:nth-of-type(2) {
-                        font-size: 28px; /*px*/
+                        font-size: 28px; 
                         color: #666;
                     }
                 }
             }
             .money-wrap{
                 color: #666;
-                font-size: 32px; /*px*/
+                font-size: 28px; 
                 span{
                     color: #3399ff;
                     font-weight: bold;
@@ -329,13 +329,13 @@ export default {
                 margin-right: 10px;
             }
             span{
-                font-size: 32px;/*px*/
+                font-size: 28px;
             }
         }
         .select-info{
             margin-left: -40px;
             span{
-                font-size: 26px;/*px*/
+                font-size: 26px;
             }
         }
         .submit{
@@ -344,7 +344,7 @@ export default {
             background-color: #3399ff;
             line-height: 100px;
             text-align: center;
-            font-size: 32px; /*px*/
+            font-size: 30px; 
             color: #fff;
             font-weight: bold;
         }
