@@ -40,7 +40,7 @@ if (location.host === '192.168.2.81:3001' ) {
         return new Promise((resolve, reject) => {
             axios({
                 method: 'POST',
-                url: API_URL+'//dev-open.yunbisai.com'+url,
+                url: API_URL+'open.yunbisai.com'+url,
                 data: Qs.stringify(params),
                 header: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -58,7 +58,7 @@ if (location.host === '192.168.2.81:3001' ) {
         return new Promise((resolve, reject) => {
             axios({
                 method: 'POST',
-                url: API_URL+'//api-open.yunbisai.com'+url,
+                url: API_URL+'api.yunbisai.com'+url,
                 data: Qs.stringify(params),
                 header: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',

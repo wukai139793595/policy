@@ -65,6 +65,7 @@
                     <span class="name">邮箱</span>
                     <input type="text" placeholder="输入投保人邮箱" @input="infoChange" v-model="email"> 
                 </div>
+                
                 <!-- <div class="relative-wrap">
                     <span class="name">关系</span>
                     <el-select class="el-se-relative" v-model="selectRelative" placeholder="请选择与被保人关系" @change="infoChange">
@@ -99,6 +100,7 @@
                         <img class="pay-icon" src="../assets/icon/bank.png" alt="">
                         <div class="name-wrap">
                             <div class="name">建行支付宝</div>
+                            
                             <!-- <div class="bank-number">储蓄卡<span>(3365)</span></div> -->
                         </div>
                     </div>
@@ -130,6 +132,7 @@
                 :qr_code='qr_code'
                 :amount= 'amount'
                 :chooseWay = 'chooseWay'
+                :orderId = 'orderId'
             />
         </div>
     </div>
@@ -227,8 +230,10 @@ export default {
             }         
         },
         infoChange () {   //内容改变事件函数
+            //#region 
             // console.log(this.startTime , this.endTime , this.name , this.selectCertificate , this.certificateValue , this.selectRelative , this.phone , this.email)
             // console.log(this.couldSubmit);
+            //#endregion
             this.checkSubmit();
         },
         changePayWay (event, payWay) {   //改变支付渠道

@@ -38,7 +38,7 @@
       data(){
             return {
               codes:'',
-              times: 100,
+              times: 10,
               timeId: 0,
               isSuccess: false
             }
@@ -48,25 +48,27 @@
       },
 
       methods: {
+        //订单轮询
         pollingOrder () {
+          var that = this;
           postPolling({
-            orderid: this.orderId
+            orderid: that.orderId
           }).then(res => {
             if (res.data.code === 'success') {
-              console.log(`orderid:${this.orderId};success`)
-              this.isSuccess = true;
-              clearTimeout(this.timeId);
+              console.log(`orderid:${that.orderId};success`)
+              that.isSuccess = true;
+              clearTimeout(that.timeId);
               setTimeout(() => {
-                this.$router.push({
+                that.$router.push({
                   path: '/'
                 })
               }, 3e3)
 
             } else if (res.data.code === 'waiting') {
-              console.log(`orderid:${this.orderId};waiting`)
-              this.times -= 1;
-              if (this.times > 0) {
-                this.timeId = setTimeout(this.pollingOrder, 3000)
+              console.log(`orderid:${that.orderId};waiting;times:${that.times}`)
+              that.times -= 1;
+              if (that.times > 0) {
+                that.timeId = setTimeout(that.pollingOrder, 3000)
               }
             } else {
 
@@ -76,13 +78,14 @@
           })
         },
         useqrcode(){
-          if (this.qr_code) {
+          var that = this;
+          if (that.qr_code) {
             var canvas = document.getElementById('canvas')
-            QRCode.toCanvas(canvas, this.qr_code, function (error) {
+            QRCode.toCanvas(canvas, that.qr_code, function (error) {
               if (error) {
                 console.error(error)
               } else {
-                this.timeId = setTimeout(this.pollingOrder,3000)
+                that.timeId = setTimeout(that.pollingOrder,3000)
               }
             })
 
@@ -90,11 +93,11 @@
         }
       },
       created () {
-          console.log('qr_code',this.qr_code);
-          console.log('amount',this.amount);
+          console.log('qr_code',that.qr_code);
+          console.log('amount',that.amount);
       },
       mounted(){
-            this.useqrcode();
+            that.useqrcode();
       }
     }
 </script>

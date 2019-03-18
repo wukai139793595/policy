@@ -113,7 +113,7 @@ export default {
         Scroll
     },
     created () {
-        this.eventId = window.name || '1620';
+        this.eventId = '1620' || window.parant.name ;
         this.initData();
     }
 }
