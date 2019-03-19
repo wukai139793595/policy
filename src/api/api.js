@@ -3,12 +3,12 @@ import Qs from 'qs'
 axios.defaults.widthCredentials = true;
 const API_URL = (function () {
     // 返回请求头，如http://dev等
-    if (/^dev-/.test(location.host)) {
-        return location.protocol + '//dev-'
+    if (/^dev-/.test(location.host) || /^localhost/.test(location.host)) {
+        return 'http://dev-'
     } else if (/^test-/.test(location.host)) {
-        return location.protocol+ '//test-'
+        return 'http://test-'
     } else {
-        return location.protocol + '//'
+        return 'http://'
     }
 })()
 
@@ -37,6 +37,7 @@ if (location.host === '192.168.2.81:3001' ) {
 } else {
     //以http://dev-open开头的请求
     var post = function (url, params) {
+        console.log(API_URL)
         return new Promise((resolve, reject) => {
             axios({
                 method: 'POST',

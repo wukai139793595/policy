@@ -322,7 +322,7 @@ export default {
                     this.$message.error(res.data.msg);
                 }
             },(err) => {
-                this.$message.erro('网络错误')
+                this.$message.error('网络错误')
             })
             // 余额支付成功和建行二维码url返回
             .then((res) => {
@@ -386,7 +386,7 @@ export default {
             }
         })
         .catch((err) => {
-            this.$message.err('网络错误')
+            this.$message.error('网络错误')
         })
     },
     components: {
@@ -494,6 +494,9 @@ export default {
                 margin-bottom: 20px;
                 margin-top: 20px;
                 display: flex;
+                input{
+                    font-size: 28px;
+                }
                 .name{
                     color: #333;
                     font-size: 30px;
