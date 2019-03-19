@@ -68,6 +68,7 @@ span.el-input__prefix{
 }
 .el-date-editor .el-input__inner{
     margin-left: 0;
+    font-size: 28px;
 }
 /* 下拉框样式改写 */
 .el-scrollbar__view .el-select-dropdown__item{

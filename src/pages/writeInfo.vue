@@ -272,12 +272,13 @@ export default {
                     name: ele.name,
                     id_card: ele.idcard,
                     type: 1,
-                    tel: ele.tel
+                    tel: ele.tel,
+                    birthday: ele.birthday
                 }
             })
             var data = {
                 // ssid: 'e9hbliskas76gss1oh24l2hui4',
-                org_id: 1,
+                // org_id: 1,
                 // entrance: 1,  //该参数已删除
                 event_group_id: this.$route.query.groupId,
                 id: this.$route.query.policyId,
