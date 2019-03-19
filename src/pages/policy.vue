@@ -63,7 +63,7 @@ export default {
         initData () {
             this.isClock = true;
             postGroup({
-                event_id: this.eventId,   //需替换成参数
+                event_id: this.eventID,   //需替换成参数
                 page: this.page,
                 limit: this.limit
             })
@@ -117,9 +117,11 @@ export default {
         lsHead
     },
     created () {
-        this.eventId = '1620' || window.parent.name ;
-        this.eventValue = window.parent.eventValue || '1111';  
-        console.log(this.eventValue)
+        // this.eventId = '1620' || window.parent.name ;
+        if (this.$route.query.event_id) {
+            this.eventID = this.$route.query.event_id;
+        }
+        console.log(this.eventID)
         this.initData();
     }
 }

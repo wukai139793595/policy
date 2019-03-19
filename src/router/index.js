@@ -6,7 +6,7 @@ import selectPerson from '@/pages/selectPerson'
 import writeInfo from '@/pages/writeInfo'
 Vue.use(Router)
 
-export default new Router({
+let router =  new Router({
   routes: [
     {
       path: '/',
@@ -34,3 +34,14 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  // console.log(to,from);
+  // console.log('router inner:',from.query.eventID)
+  // if (from.query.eventID) {
+  //   next({path:to.routes.path,query:{eventID:from.query.eventID}});
+  // }
+
+  next();
+})
+export default router
