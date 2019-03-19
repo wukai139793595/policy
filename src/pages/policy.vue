@@ -117,7 +117,9 @@ export default {
         lsHead
     },
     created () {
-        this.eventId = '1620' || window.parant.name ;
+        this.eventId = '1620' || window.parent.name ;
+        this.eventValue = window.parent.eventValue || '1111';  
+        console.log(this.eventValue)
         this.initData();
     }
 }

@@ -26,18 +26,27 @@
         height: 80px;
         margin: 0 auto;
         // padding-top: 20px;
-        padding: 10px 24px 10px 24px;
+        // padding: 10px 24px 10px 24px;
+        // text-align: center;
+        position: relative;
+        // line-height: 60px;
+        box-shadow: 2px 8px 10px #eee;
+        padding-top: 20px;
         text-align: center;
         position: relative;
-        line-height: 60px;
-        box-shadow: 2px 8px 10px #eee;
+        line-height: 30px;        
         .turn-back{
             // position: absolute;
             // left: 24px;
             // top: 12px;
             margin-left: 24px;
-            width: 40px;
-            height: 40px;
+            // width: 40px;
+            // height: 40px;
+            position: absolute;
+            left: 0px;
+            top: 20px;
+            width: 30px;
+            height: 30px;
             img{
                 width: 100%;
                 height: 100%;
